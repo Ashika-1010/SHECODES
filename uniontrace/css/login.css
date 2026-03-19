@@ -1,0 +1,36 @@
+/* Login screen styles */
+/* ── LOGIN ── */
+#s-login{align-items:center;justify-content:center;background:var(--bg);overflow:hidden;}
+.login-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;}
+.back-lnk{position:absolute;top:24px;left:32px;font-size:12px;color:var(--t3);cursor:pointer;font-family:'Share Tech Mono',monospace;letter-spacing:1px;z-index:20;transition:color 0.2s;display:flex;align-items:center;gap:6px;}
+.back-lnk:hover{color:var(--c1);}
+.login-split{display:flex;width:100%;max-width:960px;height:580px;position:relative;z-index:5;border:1px solid rgba(0,212,255,0.12);animation:fadeUp 0.5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-left{flex:1;background:rgba(0,212,255,0.02);padding:52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(0,212,255,0.08);}
+.ll-tag{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--t3);margin-bottom:32px;}
+.ll-h{font-family:'Orbitron',monospace;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:14px;}
+.ll-h span{color:var(--c1);}
+.ll-sub{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:36px;}
+.ll-feats{display:flex;flex-direction:column;gap:14px;}
+.lf{display:flex;align-items:center;gap:12px;}
+.lf-icon{width:32px;height:32px;border:1px solid rgba(0,212,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lf-text{font-size:13px;color:var(--t2);}
+.lf-text strong{color:var(--t1);font-weight:500;}
+.login-right{width:380px;background:var(--bg2);padding:52px;display:flex;flex-direction:column;justify-content:center;}
+.lr-logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--t1);letter-spacing:3px;margin-bottom:6px;}
+.lr-logo span{color:var(--c1);}
+.lr-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:28px;}
+.sec-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);margin-bottom:24px;}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--c3);}
+.sb-txt{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--c3);letter-spacing:1px;}
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--t3);margin-bottom:8px;}
+.fg input{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.14);color:var(--t1);padding:12px 16px;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.fg input:focus{border-color:var(--c1);}
+.fg input::placeholder{color:var(--t3);}
+.login-btn{width:100%;padding:14px;background:var(--c1);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;border:none;margin-top:6px;transition:all 0.2s;}
+.login-btn:hover{background:#33ddff;}
+.login-err{font-size:11px;color:var(--c2);font-family:'Share Tech Mono',monospace;margin-top:10px;display:none;text-align:center;}
+.login-err.show{display:block;}
+.login-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:14px;font-family:'Share Tech Mono',monospace;}
+.login-hint span{color:var(--c1);cursor:pointer;text-decoration:underline;}

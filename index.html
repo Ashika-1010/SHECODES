@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNIONTRACE — Fund Flow Intelligence</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><polygon points='16,2 30,9 30,23 16,30 2,23 2,9' fill='%2300d4ff'/><text x='16' y='21' font-family='sans-serif' font-weight='bold' font-size='16' fill='%23000' text-anchor='middle'>S</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#03060f;--bg2:#060d1c;--bg3:#091222;
+  --c1:#00d4ff;--c2:#ff2d55;--c3:#00ff88;--c4:#ffb700;--c5:#7c3aed;
+  --t1:#f0f8ff;--t2:#8ab4cc;--t3:#3d6478;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--t1);}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.02) 3px,rgba(0,0,0,0.02) 4px);pointer-events:none;z-index:9999;}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.screen{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow-y:auto;}
+.screen.show{display:flex;}
+
+/* ── BOOT SCREEN ── */
+#s-boot{align-items:center;justify-content:center;background:var(--bg);z-index:1000;}
+.boot-logo{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:var(--c1);letter-spacing:6px;margin-bottom:8px;text-shadow:0 0 40px rgba(0,212,255,0.4);}
+.boot-logo span{color:var(--c2);}
+.boot-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:3px;margin-bottom:40px;}
+.boot-bar-wrap{width:280px;height:2px;background:rgba(0,212,255,0.1);position:relative;}
+.boot-bar{height:100%;background:var(--c1);width:0%;transition:width 0.1s linear;}
+.boot-status{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--t3);margin-top:12px;letter-spacing:2px;height:16px;}
+
+/* ── LANDING ── */
+#s-land{overflow-y:auto;background:var(--bg);}
+.land-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:60px 60px;animation:gridDrift 25s linear infinite;pointer-events:none;z-index:1;}
+@keyframes gridDrift{to{background-position:60px 60px;}}
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:1;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:orbFloat 8s ease-in-out infinite;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-30px) scale(1.05)}}
+/* NAV */
+.land-nav{position:sticky;top:0;padding:20px 60px;display:flex;align-items:center;justify-content:space-between;z-index:50;background:rgba(3,6,15,0.9);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,212,255,0.08);}
+.logo-txt{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:var(--t1);letter-spacing:3px;}
+.logo-txt span{color:var(--c1);}
+.lnav-links{display:flex;gap:32px;}
+.lnl{font-size:13px;color:var(--t2);cursor:pointer;transition:color 0.2s;font-weight:500;}
+.lnl:hover{color:var(--t1);}
+.lnav-right{display:flex;gap:10px;}
+.btn-ghost{padding:10px 24px;background:transparent;color:var(--c1);font-family:'Inter',sans-serif;font-weight:500;font-size:13px;letter-spacing:1px;cursor:pointer;border:1px solid rgba(0,212,255,0.35);transition:all 0.2s;}
+.btn-ghost:hover{background:rgba(0,212,255,0.08);}
+.btn-primary{padding:10px 24px;background:var(--c1);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;border:none;transition:all 0.2s;}
+.btn-primary:hover{background:#33ddff;transform:translateY(-1px);}
+/* HERO */
+.hero{position:relative;z-index:5;min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px 60px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.2);padding:6px 18px;font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;color:var(--c1);margin-bottom:32px;}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--c3);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-h1{font-family:'Orbitron',monospace;font-size:clamp(32px,6vw,74px);font-weight:900;line-height:1.05;margin-bottom:24px;letter-spacing:-1px;}
+.hero-h1 .hl{color:var(--c1);}
+.hero-h1 .hl2{color:var(--c2);}
+.hero-sub{font-size:17px;color:var(--t2);line-height:1.75;max-width:560px;margin:0 auto 44px;font-weight:300;}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;}
+.hero-stats{display:flex;gap:64px;justify-content:center;flex-wrap:wrap;padding-top:40px;border-top:1px solid rgba(0,212,255,0.1);}
+.hs-item{text-align:center;}
+.hs-val{font-family:'Orbitron',monospace;font-size:30px;font-weight:700;color:var(--c1);}
+.hs-lbl{font-size:11px;color:var(--t3);letter-spacing:2px;font-family:'Share Tech Mono',monospace;margin-top:6px;}
+/* FEATURES */
+.features{position:relative;z-index:5;padding:100px 60px;background:rgba(6,13,28,0.6);}
+.section-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:4px;color:var(--c1);margin-bottom:16px;text-align:center;}
+.section-h{font-family:'Orbitron',monospace;font-size:clamp(24px,3vw,36px);font-weight:700;text-align:center;margin-bottom:60px;}
+.section-h span{color:var(--c1);}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;}
+.feat-card{background:rgba(3,6,15,0.8);border:1px solid rgba(0,212,255,0.1);padding:28px;transition:all 0.3s;cursor:default;}
+.feat-card:hover{border-color:rgba(0,212,255,0.3);transform:translateY(-4px);background:rgba(0,212,255,0.03);}
+.fc-icon{width:44px;height:44px;border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+.fc-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:600;margin-bottom:10px;color:var(--t1);}
+.fc-desc{font-size:13px;color:var(--t2);line-height:1.65;}
+/* HOW IT WORKS */
+.howitworks{position:relative;z-index:5;padding:100px 60px;}
+.steps{display:flex;gap:0;max-width:1000px;margin:0 auto;position:relative;}
+.steps::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:rgba(0,212,255,0.15);}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 20px;}
+.step-num{width:56px;height:56px;border:1px solid rgba(0,212,255,0.3);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--c1);background:var(--bg2);margin-bottom:20px;position:relative;z-index:2;}
+.step-title{font-size:14px;font-weight:600;margin-bottom:10px;font-family:'Inter',sans-serif;}
+.step-desc{font-size:12px;color:var(--t2);line-height:1.6;}
+/* COMPLIANCE */
+.compliance{position:relative;z-index:5;padding:80px 60px;background:rgba(6,13,28,0.6);}
+.comp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto;}
+.comp-card{background:rgba(3,6,15,0.8);border:1px solid rgba(0,212,255,0.1);padding:24px;text-align:center;}
+.cc-val{font-family:'Orbitron',monospace;font-size:22px;font-weight:700;color:var(--c1);margin-bottom:8px;}
+.cc-lbl{font-size:11px;color:var(--t2);line-height:1.5;}
+/* FOOTER */
+.footer{position:relative;z-index:5;padding:40px 60px;border-top:1px solid rgba(0,212,255,0.08);display:flex;align-items:center;justify-content:space-between;}
+.footer-logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--t1);letter-spacing:3px;}
+.footer-logo span{color:var(--c1);}
+.footer-links{display:flex;gap:24px;}
+.fl{font-size:12px;color:var(--t3);cursor:pointer;transition:color 0.2s;}
+.fl:hover{color:var(--t2);}
+.footer-copy{font-size:11px;color:var(--t3);font-family:'Share Tech Mono',monospace;}
+
+/* ── LOGIN ── */
+#s-login{align-items:center;justify-content:center;background:var(--bg);overflow:hidden;}
+.login-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;}
+.back-lnk{position:absolute;top:24px;left:32px;font-size:12px;color:var(--t3);cursor:pointer;font-family:'Share Tech Mono',monospace;letter-spacing:1px;z-index:20;transition:color 0.2s;display:flex;align-items:center;gap:6px;}
+.back-lnk:hover{color:var(--c1);}
+.login-split{display:flex;width:100%;max-width:960px;height:580px;position:relative;z-index:5;border:1px solid rgba(0,212,255,0.12);animation:fadeUp 0.5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-left{flex:1;background:rgba(0,212,255,0.02);padding:52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(0,212,255,0.08);}
+.ll-tag{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--t3);margin-bottom:32px;}
+.ll-h{font-family:'Orbitron',monospace;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:14px;}
+.ll-h span{color:var(--c1);}
+.ll-sub{font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:36px;}
+.ll-feats{display:flex;flex-direction:column;gap:14px;}
+.lf{display:flex;align-items:center;gap:12px;}
+.lf-icon{width:32px;height:32px;border:1px solid rgba(0,212,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lf-text{font-size:13px;color:var(--t2);}
+.lf-text strong{color:var(--t1);font-weight:500;}
+.login-right{width:380px;background:var(--bg2);padding:52px;display:flex;flex-direction:column;justify-content:center;}
+.lr-logo{font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:var(--t1);letter-spacing:3px;margin-bottom:6px;}
+.lr-logo span{color:var(--c1);}
+.lr-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:28px;}
+.sec-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.15);margin-bottom:24px;}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--c3);}
+.sb-txt{font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--c3);letter-spacing:1px;}
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--t3);margin-bottom:8px;}
+.fg input{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.14);color:var(--t1);padding:12px 16px;font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+.fg input:focus{border-color:var(--c1);}
+.fg input::placeholder{color:var(--t3);}
+.login-btn{width:100%;padding:14px;background:var(--c1);color:#000;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;border:none;margin-top:6px;transition:all 0.2s;}
+.login-btn:hover{background:#33ddff;}
+.login-err{font-size:11px;color:var(--c2);font-family:'Share Tech Mono',monospace;margin-top:10px;display:none;text-align:center;}
+.login-err.show{display:block;}
+.login-hint{font-size:11px;color:var(--t3);text-align:center;margin-top:14px;font-family:'Share Tech Mono',monospace;}
+.login-hint span{color:var(--c1);cursor:pointer;text-decoration:underline;}
+
+/* ── APP ── */
+#s-app{flex-direction:row;overflow:hidden;}
+/* SIDEBAR */
+.sidebar{width:64px;background:var(--bg2);border-right:1px solid rgba(0,212,255,0.1);display:flex;flex-direction:column;align-items:center;z-index:50;transition:width 0.28s ease;overflow:hidden;flex-shrink:0;}
+.sidebar:hover{width:220px;}
+.sb-logo{width:100%;padding:18px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(0,212,255,0.07);}
+.sb-logo-icon{width:32px;height:32px;border:1.5px solid var(--c1);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-logo-txt{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--c1);letter-spacing:2px;white-space:nowrap;opacity:0;transition:opacity 0.15s;}
+.sidebar:hover .sb-logo-txt{opacity:1;}
+.sb-nav{flex:1;width:100%;padding:12px 0;}
+.sbn{width:100%;display:flex;align-items:center;padding:13px 16px;cursor:pointer;transition:all 0.2s;border-left:2px solid transparent;gap:12px;}
+.sbn:hover{background:rgba(0,212,255,0.05);}
+.sbn.active{background:rgba(0,212,255,0.07);border-left-color:var(--c1);}
+.sbn-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--t3);transition:color 0.2s;}
+.sbn.active .sbn-icon,.sbn:hover .sbn-icon{color:var(--c1);}
+.sbn-lbl{font-size:12px;font-weight:500;white-space:nowrap;opacity:0;transition:opacity 0.15s;color:var(--t2);}
+.sidebar:hover .sbn-lbl{opacity:1;}
+.sbn.active .sbn-lbl{color:var(--t1);}
+.sbn-bdg{background:var(--c2);color:#fff;font-size:9px;font-family:'Share Tech Mono',monospace;padding:1px 5px;border-radius:8px;white-space:nowrap;opacity:0;transition:opacity 0.15s;margin-left:auto;}
+.sidebar:hover .sbn-bdg{opacity:1;}
+.sb-bottom{width:100%;padding:16px;border-top:1px solid rgba(0,212,255,0.07);display:flex;align-items:center;gap:10px;}
+.sb-av{width:32px;height:32px;border-radius:50%;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--c1);flex-shrink:0;}
+.sb-uinfo{opacity:0;transition:opacity 0.15s;white-space:nowrap;}
+.sidebar:hover .sb-uinfo{opacity:1;}
+.sb-uname{font-size:12px;font-weight:500;}
+.sb-urole{font-size:9px;color:var(--t3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+/* TOP BAR */
+.topbar{height:56px;background:rgba(3,6,15,0.98);border-bottom:1px solid rgba(0,212,255,0.1);display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;}
+.tb-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:600;flex:1;}
+.tb-search{display:flex;align-items:center;gap:8px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);padding:8px 14px;width:220px;}
+.tb-search input{background:transparent;border:none;color:var(--t1);font-size:13px;outline:none;width:100%;font-family:'Inter',sans-serif;}
+.tb-search input::placeholder{color:var(--t3);}
+.tb-live{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid rgba(0,255,136,0.2);font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--c3);letter-spacing:1px;}
+.tb-live-dot{width:5px;height:5px;border-radius:50%;background:var(--c3);animation:blink 1s infinite;}
+.tb-alert-btn{padding:6px 14px;background:rgba(255,45,85,0.1);border:1px solid rgba(255,45,85,0.3);font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--c2);cursor:pointer;letter-spacing:1px;transition:all 0.2s;}
+.tb-alert-btn:hover{background:rgba(255,45,85,0.18);}
+.app-main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.app-content{flex:1;overflow:hidden;position:relative;}
+.app-page{position:absolute;inset:0;display:none;overflow-y:auto;animation:fadeUp 0.3s ease;}
+.app-page.show{display:block;}
+
+/* ── GRAPH PAGE ── */
+.graph-layout{display:flex;height:100%;}
+.graph-cv-area{flex:1;position:relative;}
+#main-cv{width:100%;height:100%;display:block;}
+.g-ctrl{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px;z-index:10;}
+.g-btn{padding:7px 14px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;border:1px solid rgba(0,212,255,0.18);background:rgba(3,6,15,0.92);color:var(--t3);transition:all 0.2s;text-transform:uppercase;}
+.g-btn:hover,.g-btn.active{border-color:var(--c1);color:var(--c1);background:rgba(0,212,255,0.07);}
+.g-legend{position:absolute;bottom:16px;left:16px;background:rgba(3,6,15,0.92);border:1px solid rgba(0,212,255,0.12);padding:12px 16px;display:flex;flex-direction:column;gap:8px;z-index:10;}
+.gli{display:flex;align-items:center;gap:8px;font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--t2);}
+.gld{width:8px;height:8px;border-radius:50%;}
+.g-hud{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:10;}
+.g-hud-card{background:rgba(3,6,15,0.92);border:1px solid rgba(0,212,255,0.15);padding:12px 18px;min-width:120px;}
+.ghc-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:6px;}
+.ghc-val{font-family:'Orbitron',monospace;font-size:24px;font-weight:700;}
+.node-panel{width:268px;background:var(--bg2);border-left:1px solid rgba(0,212,255,0.1);display:flex;flex-direction:column;flex-shrink:0;}
+.np-hd{padding:20px;border-bottom:1px solid rgba(0,212,255,0.08);}
+.np-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:12px;}
+.np-id{font-family:'Orbitron',monospace;font-size:16px;font-weight:600;color:var(--c1);margin-bottom:4px;}
+.np-sub{font-size:12px;color:var(--t2);}
+.np-rows{padding:16px;flex:1;overflow-y:auto;}
+.np-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(0,212,255,0.06);}
+.np-k{font-size:11px;color:var(--t3);font-family:'Share Tech Mono',monospace;}
+.np-v{font-size:12px;font-weight:500;}
+.risk-section{padding:16px;border-top:1px solid rgba(0,212,255,0.08);}
+.risk-label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.risk-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;}
+.risk-score{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--c2);}
+.risk-track{height:4px;background:rgba(255,255,255,0.06);}
+.risk-fill{height:100%;background:linear-gradient(90deg,#00ff88,#ffb700,#ff2d55);}
+.risk-marks{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);font-family:'Share Tech Mono',monospace;margin-top:6px;}
+
+/* ── DASHBOARD PAGE ── */
+.dash-body{padding:24px;display:flex;flex-direction:column;gap:18px;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.sc{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);padding:20px;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+.sc.r::before{background:var(--c2)}.sc.a::before{background:var(--c4)}.sc.b::before{background:var(--c1)}.sc.g::before{background:var(--c3);}
+.sc-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:10px;}
+.sc-num{font-family:'Orbitron',monospace;font-size:30px;font-weight:700;}
+.sc-chg{font-size:11px;margin-top:6px;font-family:'Share Tech Mono',monospace;color:var(--t3);}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.dc{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);display:flex;flex-direction:column;}
+.dc-hd{padding:14px 18px;border-bottom:1px solid rgba(0,212,255,0.07);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.dc-ttl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;}
+.dc-body{padding:18px;flex:1;}
+.al-row{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,212,255,0.05);cursor:pointer;}
+.al-row:hover{background:rgba(0,212,255,0.02);margin:0 -18px;padding-left:18px;padding-right:18px;}
+.al-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+.al-id{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--c1);}
+.al-type{font-size:13px;font-weight:500;}
+.al-meta{font-size:11px;color:var(--t3);margin-top:2px;}
+.al-right{margin-left:auto;text-align:right;flex-shrink:0;}
+.al-amt{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;}
+.al-time{font-size:10px;color:var(--t3);font-family:'Share Tech Mono',monospace;}
+.bar-wrap{display:flex;align-items:flex-end;gap:4px;height:86px;}
+.bbar{flex:1;border-radius:1px 1px 0 0;min-width:5px;cursor:pointer;transition:opacity 0.2s;}
+.bbar:hover{opacity:0.75;}
+.typ-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,212,255,0.05);}
+.ty-n{font-size:12px;font-weight:500;min-width:132px;}
+.ty-trk{flex:1;height:4px;background:rgba(255,255,255,0.05);}
+.ty-f{height:100%;}
+.ty-ct{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--t3);min-width:40px;text-align:right;}
+.ml-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mlc{background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.08);padding:10px;}
+.ml-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-bottom:4px;}
+.ml-num{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;}
+.ml-trk{height:2px;background:rgba(255,255,255,0.05);margin-top:6px;}
+.ml-fill{height:100%;}
+
+/* ── INVESTIGATE PAGE ── */
+.inv-layout{display:flex;height:100%;}
+.inv-left{width:300px;background:var(--bg2);border-right:1px solid rgba(0,212,255,0.1);display:flex;flex-direction:column;flex-shrink:0;}
+.inv-center{flex:1;display:flex;flex-direction:column;min-width:0;}
+.inv-right{width:280px;background:var(--bg2);border-left:1px solid rgba(0,212,255,0.1);display:flex;flex-direction:column;flex-shrink:0;}
+.panel-hd{padding:13px 18px;border-bottom:1px solid rgba(0,212,255,0.08);font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;flex-shrink:0;}
+.flow-item{display:flex;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(0,212,255,0.05);}
+.fi-line{display:flex;flex-direction:column;align-items:center;}
+.fi-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.fi-conn{width:1px;flex:1;background:rgba(0,212,255,0.1);margin-top:4px;min-height:16px;}
+.fi-name{font-size:12px;font-weight:600;}
+.fi-det{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);margin:3px 0;}
+.fi-amt{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;margin-top:3px;}
+.fi-tag{display:inline-block;padding:2px 8px;font-size:8px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-top:4px;}
+.tl-panel{padding:16px 18px;border-top:1px solid rgba(0,212,255,0.08);flex-shrink:0;}
+.tl-trk{height:4px;background:rgba(255,255,255,0.06);position:relative;cursor:pointer;margin:8px 0 6px;}
+.tl-prog{height:100%;background:var(--c1);pointer-events:none;}
+.tl-knob{width:12px;height:12px;border-radius:50%;background:var(--c1);position:absolute;top:-4px;margin-left:-6px;pointer-events:none;}
+.tl-times{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:12px;}
+.tl-btns{display:flex;gap:8px;}
+.inv-cv-area{flex:1;position:relative;}
+#inv-cv{width:100%;height:100%;display:block;}
+.inv-meta{padding:12px 20px;border-top:1px solid rgba(0,212,255,0.08);background:rgba(3,6,15,0.6);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0;}
+.im .im-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;margin-bottom:4px;}
+.im .im-val{font-family:'Orbitron',monospace;font-size:15px;font-weight:600;}
+.chat-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.cm{padding:10px 14px;font-size:12px;line-height:1.65;}
+.cm.ai{background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.12);border-radius:0 8px 8px 8px;}
+.cm.usr{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:8px 0 8px 8px;align-self:flex-end;max-width:92%;}
+.cm-who{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--t3);letter-spacing:1px;margin-bottom:5px;}
+.typing{display:flex;gap:4px;padding:12px 16px;}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--c1);animation:typeBounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}
+.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes typeBounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+.chat-bar{padding:10px 14px;border-top:1px solid rgba(0,212,255,0.08);display:flex;gap:8px;flex-shrink:0;}
+.chat-bar input{flex:1;background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.12);color:var(--t1);padding:9px 12px;font-family:'Inter',sans-serif;font-size:13px;outline:none;}
+.chat-bar input:focus{border-color:var(--c1);}
+.chat-bar button{padding:9px 14px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:var(--c1);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.chat-bar button:hover{background:rgba(0,212,255,0.15);}
+.ml-mini{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px;}
+
+/* ── REPORTS PAGE ── */
+.rep-body{padding:24px;}
+.rep-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.rc{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);padding:24px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+.rc:hover{border-color:rgba(0,212,255,0.3);transform:translateY(-3px);background:rgba(0,212,255,0.02);}
+.rc-icon{width:42px;height:42px;border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.rc-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;margin-bottom:8px;}
+.rc-desc{font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:14px;}
+.rc-status{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;}
+.rep-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.str-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.25);color:var(--c1);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
+.str-btn:hover{background:rgba(0,212,255,0.14);}
+.rep-tbl{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);}
+.rt-hd{display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:11px 18px;border-bottom:1px solid rgba(0,212,255,0.1);background:rgba(0,212,255,0.03);}
+.rtc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;}
+.rt-row{display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:13px 18px;border-bottom:1px solid rgba(0,212,255,0.05);cursor:pointer;transition:background 0.15s;}
+.rt-row:hover{background:rgba(0,212,255,0.02);}
+.rt-row .rtc{color:var(--t1);font-size:11px;}
+.slide-in{animation:slideRight 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;}
+@keyframes slideRight{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+
+/* MOBILE RESPONSIVE */
+.mob-menu-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;z-index:100;}
+.mob-menu-btn span{width:24px;height:2px;background:var(--c1);}
+@media(max-width:900px){
+  .mob-menu-btn{display:flex;}
+  .lnav-links{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(3,6,15,0.98);flex-direction:column;padding:30px;gap:24px;border-bottom:1px solid rgba(0,212,255,0.1);align-items:center;}
+  .lnav-links.show{display:flex;}
+  .m-flex-col{flex-direction:column!important;align-items:center;gap:24px!important;}
+  .hero-h1{font-size:36px;}
+  .feat-grid, .comp-grid, .stat-row, .ml-grid, .rep-cards-grid{grid-template-columns:1fr;}
+  .dash-grid{grid-template-columns:1fr!important;}
+  .dash-grid .dc{grid-row:auto!important;}
+  .steps{flex-direction:column;gap:30px;}
+  .steps::before{display:none;}
+  .login-split{flex-direction:column;height:auto;}
+  .login-left{border-right:none;border-bottom:1px solid rgba(0,212,255,0.1);padding:40px;}
+  .login-right{width:100%;padding:40px;}
+  .footer{flex-direction:column;gap:24px;text-align:center;}
+  #s-app{flex-direction:column;}
+  .sidebar{width:100% !important;height:60px;flex-direction:row;align-items:center;border-right:none;border-bottom:1px solid rgba(0,212,255,0.1);flex-shrink:0;}
+  .sidebar:hover{width:100% !important;height:60px;}
+  .sb-logo-txt{opacity:1;}
+  .sb-nav{display:flex;padding:0;overflow-x:auto;}
+  .sbn{width:auto;padding:0 16px;border-left:none;border-bottom:2px solid transparent;}
+  .sbn.active{border-left:none;border-bottom-color:var(--c1);}
+  .sbn-lbl,.sbn-bdg{display:none;}
+  .sb-bottom{display:none;}
+  .graph-layout, .inv-layout{flex-direction:column;}
+  .node-panel, .inv-left, .inv-right{width:100%;height:320px;border:none;border-top:1px solid rgba(0,212,255,0.1);flex-shrink:0;}
+  .inv-meta{grid-template-columns:1fr 1fr;}
+  .tb-search, .tb-live{display:none;}
+  .rt-hd,.rt-row{grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .rt-hd .rtc:nth-child(2),.rt-row .rtc:nth-child(2),.rt-hd .rtc:nth-child(5),.rt-row .rtc:nth-child(5){display:none;}
+}
+
+/* NOTIFICATIONS */
+.notif{position:fixed;top:70px;right:20px;background:rgba(3,6,15,0.97);border:1px solid rgba(255,45,85,0.4);padding:14px 18px;z-index:200;min-width:280px;animation:slideIn 0.3s ease;display:none;}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif.show{display:block;}
+.notif-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--c2);letter-spacing:2px;margin-bottom:6px;}
+.notif-msg{font-size:12px;color:var(--t1);}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- ═══════════ BOOT SCREEN ═══════════ -->
+<div class="screen show" id="s-boot">
+  <div class="boot-logo">UNION<span>TRACE</span></div>
+  <div class="boot-sub">UNIONTRACE OS BOOTING...</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  <div class="boot-status" id="boot-status">INITIALISING KERNEL...</div>
+</div>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<div class="screen" id="s-land">
+  <div class="land-grid"></div>
+  <div class="orbs">
+    <div class="orb" style="width:450px;height:450px;background:rgba(0,212,255,0.05);top:-120px;left:-120px;animation-delay:0s;"></div>
+    <div class="orb" style="width:320px;height:320px;background:rgba(255,45,85,0.05);bottom:-80px;right:-80px;animation-delay:3s;"></div>
+    <div class="orb" style="width:220px;height:220px;background:rgba(124,58,237,0.05);top:40%;right:10%;animation-delay:1.5s;"></div>
+  </div>
+
+  <nav class="land-nav" id="land-nav">
+    <div class="logo-txt">UNION<span>TRACE</span></div>
+    <div class="mob-menu-btn" onclick="document.getElementById('m-menu').classList.toggle('show')"><span></span><span></span><span></span></div>
+    <div class="lnav-links" id="m-menu">
+      <div style="display:flex;flex-direction:row;width:100%;justify-content:center;gap:32px;" class="m-flex-col">
+        <span class="lnl" onclick="document.getElementById('s-feat').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">Platform</span>
+        <span class="lnl" onclick="document.getElementById('s-how').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">How It Works</span>
+        <span class="lnl" onclick="document.getElementById('s-comp').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">Compliance</span>
+      </div>
+      <div class="lnav-right">
+        <div class="btn-ghost" onclick="go('login')">Sign In</div>
+        <div class="btn-primary" onclick="go('login')">Request Demo</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow"><span class="hero-dot"></span>AI-POWERED FRAUD INTELLIGENCE</div>
+    <h1 class="hero-h1">Follow The <span class="hl">Money.</span><br>Stop The <span class="hl2">Fraud.</span></h1>
+    <p class="hero-sub">UNIONTRACE maps every rupee moving through your bank in real time. Graph analytics and machine learning detect round-tripping, layering, and structuring before investigators even open their laptops.</p>
+    <div class="hero-btns">
+      <div class="btn-primary" style="padding:14px 40px;font-size:15px;" onclick="go('login')">Get Started Free</div>
+      <div class="btn-ghost" style="padding:14px 40px;font-size:15px;" onclick="go('login')">Watch Live Demo</div>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-item"><div class="hs-val">98.7%</div><div class="hs-lbl">ML ACCURACY</div></div>
+      <div class="hs-item"><div class="hs-val">&lt;5 MIN</div><div class="hs-lbl">DETECT TIME</div></div>
+      <div class="hs-item"><div class="hs-val">5 CR+</div><div class="hs-lbl">TX MONITORED</div></div>
+      <div class="hs-item"><div class="hs-val">FIU-IND</div><div class="hs-lbl">COMPLIANT</div></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="s-feat">
+    <div class="section-tag">PLATFORM CAPABILITIES</div>
+    <h2 class="section-h">Everything You Need to <span>Detect Fraud</span></h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="#00d4ff" stroke-width="1.4"/><circle cx="3" cy="5" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="17" cy="5" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="3" cy="15" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="17" cy="15" r="2" stroke="#00d4ff" stroke-width="1.2"/><line x1="7.2" y1="8.5" x2="4.8" y2="6.8" stroke="#00d4ff" stroke-width="1"/><line x1="12.8" y1="8.5" x2="15.2" y2="6.8" stroke="#00d4ff" stroke-width="1"/><line x1="7.2" y1="11.5" x2="4.8" y2="13.2" stroke="#00d4ff" stroke-width="1"/><line x1="12.8" y1="11.5" x2="15.2" y2="13.2" stroke="#00d4ff" stroke-width="1"/></svg></div>
+        <div class="fc-title">3D Transaction Network Graph</div>
+        <div class="fc-desc">Visualise every fund hop across accounts, branches, and channels in a live rotating 3D network. Click any node to see full account intelligence instantly.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17L7 11L10 13L14 7L17 9" stroke="#ff2d55" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="14" cy="7" r="2.5" fill="rgba(255,45,85,0.2)" stroke="#ff2d55" stroke-width="1.2"/></svg></div>
+        <div class="fc-title">5 Fraud Typology Detectors</div>
+        <div class="fc-desc">Purpose-built ML models detect Round-Tripping, Rapid Layering, Structuring, Dormant Account Activation, and Profile Mismatch — simultaneously, in real time.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#00ff88" stroke-width="1.4"/><line x1="6" y1="7" x2="14" y2="7" stroke="#00ff88" stroke-width="1"/><line x1="6" y1="10" x2="14" y2="10" stroke="#00ff88" stroke-width="1"/><line x1="6" y1="13" x2="10" y2="13" stroke="#00ff88" stroke-width="1"/></svg></div>
+        <div class="fc-title">One-Click FIU-IND STR Report</div>
+        <div class="fc-desc">Auto-generate RBI-compliant Suspicious Transaction Reports with all required fields pre-populated from graph and ML data. File in minutes, not hours.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#7c3aed" stroke-width="1.4"/><line x1="13.5" y1="13.5" x2="17" y2="17" stroke="#7c3aed" stroke-width="1.6" stroke-linecap="round"/><line x1="7" y1="9" x2="11" y2="9" stroke="#7c3aed" stroke-width="1"/><line x1="9" y1="7" x2="9" y2="11" stroke="#7c3aed" stroke-width="1"/></svg></div>
+        <div class="fc-title">AI Investigator Chat</div>
+        <div class="fc-desc">Ask natural language questions and get graph-grounded answers instantly. "Trace all funds from ACC-0091 in the last 7 days" — and watch it animate the answer.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><polygon points="10,2 18,6.5 18,13.5 10,18 2,13.5 2,6.5" stroke="#ffb700" stroke-width="1.4" fill="none"/><polyline points="6,10 9,7 11,12 14,9" stroke="#ffb700" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="fc-title">Timeline Replay</div>
+        <div class="fc-desc">Scrub back in time to watch exactly how funds moved, step by step. Show investigators and regulators a frame-by-frame reconstruction of any suspicious transaction chain.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="5" height="9" rx="1" stroke="#00d4ff" stroke-width="1.2"/><rect x="8" y="5" width="5" height="12" rx="1" stroke="#00d4ff" stroke-width="1.2"/><rect x="13" y="2" width="5" height="15" rx="1" stroke="#00d4ff" stroke-width="1.2"/></svg></div>
+        <div class="fc-title">Real-Time Risk Scoring</div>
+        <div class="fc-desc">Six ML models run simultaneously on every transaction. Composite risk scores from 0–100 update in real time as new data arrives — no batch jobs, no delays.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="howitworks" id="s-how">
+    <div class="section-tag">HOW IT WORKS</div>
+    <h2 class="section-h">From <span>Transaction</span> to Evidence in Minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Ingest</div>
+        <div class="step-desc">Every transaction streams into UNIONTRACE via Kafka in real time — NEFT, RTGS, IMPS, SWIFT, cash.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Graph</div>
+        <div class="step-desc">Funds are mapped as edges between account nodes in a Neo4j graph database updated within milliseconds.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Detect</div>
+        <div class="step-desc">Six ML models score every new edge for circular paths, layering velocity, structuring patterns, and profile mismatches.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Alert</div>
+        <div class="step-desc">Critical alerts surface in under 5 minutes with a composite risk score, typology tag, and full fund trail pre-loaded.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-title">Report</div>
+        <div class="step-desc">One click generates a FIU-IND compliant STR with all required fields auto-populated — ready to submit to regulators.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLIANCE -->
+  <section class="compliance" id="s-comp">
+    <div class="section-tag">COMPLIANCE & TRUST</div>
+    <h2 class="section-h" style="margin-bottom:40px;">Built for <span>Indian Banking</span> Regulations</h2>
+    <div class="comp-grid">
+      <div class="comp-card"><div class="cc-val">RBI</div><div class="cc-lbl">Master Directions on KYC 2016 (Updated 2023)</div></div>
+      <div class="comp-card"><div class="cc-val">PMLA</div><div class="cc-lbl">Prevention of Money Laundering Act compliance built-in</div></div>
+      <div class="comp-card"><div class="cc-val">FIU-IND</div><div class="cc-lbl">Auto-generated STR & CTR in prescribed format</div></div>
+      <div class="comp-card"><div class="cc-val">AES-256</div><div class="cc-lbl">Bank-grade encryption in transit and at rest</div></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">UNION<span>TRACE</span></div>
+    <div class="footer-links">
+      <span class="fl">Privacy Policy</span>
+      <span class="fl">Terms of Use</span>
+      <span class="fl">Security</span>
+      <span class="fl">Contact</span>
+    </div>
+    <div class="footer-copy">© 2025 UNIONTRACE · FUND FLOW INTELLIGENCE</div>
+  </footer>
+</div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div class="screen" id="s-login">
+  <div class="login-bg-grid"></div>
+  <div class="back-lnk" onclick="go('land')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="9,2 4,7 9,12" stroke="#3d6478" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+    BACK
+  </div>
+  <div class="login-split">
+    <div class="login-left">
+      <div class="ll-tag">UNIONTRACE INTELLIGENCE PLATFORM v2.1</div>
+      <h2 class="ll-h">Fraud doesn't<br>wait. <span>Neither</span><br>should you.</h2>
+      <p class="ll-sub">Real-time fund flow tracking across every account, branch, and channel. Five fraud typologies. One unified dashboard. FIU-IND compliant reporting.</p>
+      <div class="ll-feats">
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#00d4ff" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#00d4ff" stroke-width="1.2" fill="none"/></svg></div><div class="lf-text"><strong>3D Transaction Graph</strong> — every hop visualised live</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#7c3aed" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2" stroke="#7c3aed" stroke-width="1"/></svg></div><div class="lf-text"><strong>AI Investigator Chat</strong> — ask anything, get graph answers</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#ffb700" stroke-width="1.2"/><line x1="5" y1="8" x2="11" y2="8" stroke="#ffb700"/><line x1="8" y1="5" x2="8" y2="11" stroke="#ffb700"/></svg></div><div class="lf-text"><strong>One-click FIU-IND STR</strong> — auto-generate compliant reports</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#00ff88" stroke-width="1.2"/><polyline points="4,9 7,6 9,11 12,8" stroke="#00ff88" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div><div class="lf-text"><strong>Real-time risk scoring</strong> — 6 ML models, instant alerts</div></div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="lr-logo">UNION<span>TRACE</span></div>
+      <div class="lr-sub">SECURE ACCESS PORTAL</div>
+      <div class="sec-badge"><div class="sb-dot"></div><span class="sb-txt">256-BIT ENCRYPTED · RBI COMPLIANT</span></div>
+      <div class="fg"><label>OFFICER ID / EMAIL</label><input id="li-user" type="text" placeholder="officer@bank.com"></div>
+      <div class="fg"><label>PASSWORD</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="login-err" id="login-err">INVALID CREDENTIALS — TRY: admin / uniontrace</div>
+      <button class="login-btn" onclick="doLogin()">ACCESS DASHBOARD</button>
+      <div class="login-hint">Demo: <span onclick="fillDemo()">admin / uniontrace</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="screen" id="s-app">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00d4ff" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2.5" fill="#00d4ff"/></svg></div>
+      <div class="sb-logo-txt">UNIONTRACE</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sbn active" onclick="switchPage('graph',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="5" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="15" cy="5" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="13" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="15" cy="13" r="1.8" stroke="currentColor" stroke-width="1.3"/><line x1="6.5" y1="8" x2="4.5" y2="6.5" stroke="currentColor" stroke-width="1"/><line x1="11.5" y1="8" x2="13.5" y2="6.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="10" x2="4.5" y2="11.5" stroke="currentColor" stroke-width="1"/><line x1="11.5" y1="10" x2="13.5" y2="11.5" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Threat Graph</span>
+        <span class="sbn-bdg">7</span>
+      </div>
+      <div class="sbn" onclick="switchPage('dash',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="8" width="6" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="11" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg></div>
+        <span class="sbn-lbl">Dashboard</span>
+      </div>
+      <div class="sbn" onclick="switchPage('invest',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><line x1="12.5" y1="12.5" x2="16" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="8" x2="10" y2="8" stroke="currentColor" stroke-width="1"/><line x1="8" y1="6" x2="8" y2="10" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Investigate</span>
+      </div>
+      <div class="sbn" onclick="switchPage('reports',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1"/><line x1="6" y1="9" x2="12" y2="9" stroke="currentColor" stroke-width="1"/><line x1="6" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Reports</span>
+      </div>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-av">AK</div>
+      <div class="sb-uinfo"><div class="sb-uname">Arjun Kumar</div><div class="sb-urole">SR. INVESTIGATOR</div></div>
+    </div>
+  </div>
+
+  <div class="app-main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">THREAT GRAPH</div>
+      <div class="tb-search"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#3d6478" stroke-width="1.2"/><line x1="9" y1="9" x2="12" y2="12" stroke="#3d6478" stroke-width="1.4" stroke-linecap="round"/></svg><input placeholder="Search accounts, cases..."></div>
+      <div class="tb-live"><span class="tb-live-dot"></span>LIVE MONITORING</div>
+      <div class="tb-alert-btn" id="alert-btn">7 CRITICAL ALERTS</div>
+    </div>
+    <div class="app-content">
+
+      <!-- GRAPH -->
+      <div class="app-page show" id="ap-graph">
+        <div class="graph-layout" style="height:100%;">
+          <div class="graph-cv-area">
+            <canvas id="main-cv"></canvas>
+            <div class="g-ctrl">
+              <div class="g-btn active" onclick="gMode('flow',this)">FLOW MAP</div>
+              <div class="g-btn" onclick="gMode('circular',this)">CIRCULAR TX</div>
+              <div class="g-btn" onclick="gMode('layer',this)">LAYERING</div>
+              <div class="g-btn" onclick="gMode('all',this)">ALL NODES</div>
+            </div>
+            <div class="g-legend">
+              <div class="gli"><div class="gld" style="background:#ff2d55"></div>CRITICAL</div>
+              <div class="gli"><div class="gld" style="background:#ffb700"></div>HIGH RISK</div>
+              <div class="gli"><div class="gld" style="background:#00d4ff"></div>DORMANT</div>
+              <div class="gli"><div class="gld" style="background:#00ff88"></div>CLEAN</div>
+              <div class="gli"><div class="gld" style="background:#7c3aed"></div>GATEWAY</div>
+            </div>
+            <div class="g-hud">
+              <div class="g-hud-card"><div class="ghc-lbl">THREATS</div><div class="ghc-val" style="color:#ff2d55">07</div></div>
+              <div class="g-hud-card"><div class="ghc-lbl">FLAGGED</div><div class="ghc-val" style="color:#00d4ff">₹2.4Cr</div></div>
+            </div>
+          </div>
+          <div class="node-panel">
+            <div style="padding:16px 20px 0; border-bottom:none;">
+              <input id="node-search" placeholder="Search Account ID..." style="width:100%; background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.1); color:var(--t1); padding:10px 12px; font-family:'Share Tech Mono',monospace; font-size:11px; outline:none; transition:border 0.2s;" onfocus="this.style.borderColor=C1" onblur="this.style.borderColor='rgba(0,212,255,0.1)'" oninput="searchNode(this.value)">
+              <div id="search-res" style="color:var(--c2); font-family:'Share Tech Mono',monospace; font-size:9px; margin-top:6px; display:none; letter-spacing:1px;">NODE NOT FOUND</div>
+            </div>
+            <div class="np-hd"><div class="np-tag">NODE INTELLIGENCE</div><div class="np-id" id="np-id">ACC-0091</div><div class="np-sub" id="np-sub">Mumbai · Current A/C</div></div>
+            <div class="np-rows" id="np-rows"></div>
+            <div class="risk-section">
+              <div class="risk-label-row"><span class="risk-title">COMPOSITE RISK</span><span class="risk-score" id="risk-score">94/100</span></div>
+              <div class="risk-track"><div class="risk-fill" id="risk-fill" style="width:94%"></div></div>
+              <div class="risk-marks"><span>LOW</span><span>MED</span><span>HIGH</span><span>CRIT</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="app-page" id="ap-dash">
+        <div class="dash-body">
+          <div class="stat-row">
+            <div class="sc r"><div class="sc-lbl">CRITICAL ALERTS</div><div class="sc-num" style="color:#ff2d55">07</div><div class="sc-chg">↑ +3 FROM YESTERDAY</div></div>
+            <div class="sc a"><div class="sc-lbl">HIGH RISK</div><div class="sc-num" style="color:#ffb700">23</div><div class="sc-chg">UNDER REVIEW</div></div>
+            <div class="sc b"><div class="sc-lbl">FLAGGED FUNDS</div><div class="sc-num" style="color:#00d4ff">₹2.4Cr</div><div class="sc-chg">ACROSS 14 ACCOUNTS</div></div>
+            <div class="sc g"><div class="sc-lbl">ML ACCURACY</div><div class="sc-num" style="color:#00ff88">98.7%</div><div class="sc-chg">6 MODELS ACTIVE</div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:-10px;margin-bottom:12px;gap:8px;">
+            <div class="g-btn active" style="border-color:var(--c1);color:var(--c1);background:rgba(0,212,255,0.07)">TODAY</div>
+            <div class="g-btn">7 DAYS</div>
+            <div class="g-btn">30 DAYS</div>
+          </div>
+          <div class="dash-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <!-- Col 1: Alerts and Typology -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="dc" style="flex:1;"><div class="dc-hd"><span class="dc-ttl">LIVE ALERT FEED</span><div class="tb-live" style="transform:scale(0.8);transform-origin:right"><span class="tb-live-dot"></span>LIVE</div></div><div class="dc-body" id="af-body" style="overflow-y:auto;max-height:210px;"></div></div>
+              <div class="dc"><div class="dc-hd"><span class="dc-ttl">FRAUD TYPOLOGY</span></div><div class="dc-body" id="typo-rows"></div></div>
+            </div>
+            <!-- Col 2: Heatmap -->
+            <div class="dc" style="grid-row:span 2"><div class="dc-hd"><span class="dc-ttl">INDIA BRANCH HEATMAP</span></div>
+              <div class="dc-body" style="position:relative; display:flex; justify-content:center; align-items:center; padding:0; overflow:hidden; min-height:420px;">
+                <svg viewBox="0 0 400 400" width="100%" height="320" style="opacity:0.25; pointer-events:none;">
+                  <path d="M120,50 L180,80 L240,40 L300,100 L280,180 L350,220 L300,320 L240,380 L180,350 L120,380 L80,280 L60,200 L100,120 Z" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M180,80 L200,150 L280,180 M200,150 L180,250 L120,380 M180,250 L300,320 M200,150 L100,120" fill="none" stroke="var(--c1)" stroke-width="1" stroke-dasharray="4 4"/>
+                </svg>
+                <div style="position:absolute; top:35%; left:30%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c2); width:14px; height:14px; border-radius:50%; box-shadow:0 0 20px 4px var(--c2); animation:blink 1.8s infinite;"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:10px; margin-top:8px; color:var(--c2); font-weight:bold;">MUMBAI</span>
+                </div>
+                <div style="position:absolute; top:20%; left:55%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c4); width:10px; height:10px; border-radius:50%; box-shadow:0 0 12px 2px var(--c4);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c4);">DELHI</span>
+                </div>
+                <div style="position:absolute; top:70%; left:45%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c1); width:8px; height:8px; border-radius:50%; box-shadow:0 0 10px 2px var(--c1);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c1);">BANGALORE</span>
+                </div>
+                <div style="position:absolute; top:65%; left:70%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c2); width:12px; height:12px; border-radius:50%; box-shadow:0 0 15px 3px var(--c2); animation:blink 1.5s infinite;"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c2); font-weight:bold;">CHENNAI</span>
+                </div>
+                <div style="position:absolute; top:55%; left:40%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c3); width:8px; height:8px; border-radius:50%; box-shadow:0 0 8px 1px var(--c3);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c3);">HYDERABAD</span>
+                </div>
+              </div>
+            </div>
+            <!-- Col 3: Velocity and ML -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="dc"><div class="dc-hd"><span class="dc-ttl">TX VELOCITY</span></div><div class="dc-body"><div class="bar-wrap" id="vel-bars"></div></div></div>
+              <div class="dc" style="flex:1;"><div class="dc-hd"><span class="dc-ttl">ML SCORES</span></div><div class="dc-body"><div class="ml-grid" id="ml-dash"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVESTIGATE -->
+      <div class="app-page" id="ap-invest">
+        <div class="inv-layout" style="height:100%;">
+          <div class="inv-left">
+            <div class="panel-hd">FUND FLOW TRACE — CASE #2847</div>
+            <div style="overflow-y:auto;flex:1;" id="inv-flow"></div>
+            <div class="tl-panel">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:8px;">TIMELINE REPLAY</div>
+              <div class="tl-trk" id="tl-trk"><div class="tl-prog" id="tl-prog" style="width:65%"></div><div class="tl-knob" id="tl-knob" style="left:65%"></div></div>
+              <div class="tl-times"><span>T+0:00</span><span>T+0:42</span></div>
+              <div class="tl-btns">
+                <div class="g-btn" id="play-btn" onclick="tlToggle()" style="flex:1;text-align:center;">PLAY</div>
+                <div class="g-btn" onclick="tlReset()" style="flex:1;text-align:center;">RESET</div>
+              </div>
+            </div>
+          </div>
+          <div class="inv-center">
+            <div class="inv-cv-area"><canvas id="inv-cv"></canvas></div>
+            <div class="inv-meta">
+              <div class="im"><div class="im-lbl">CYCLE TIME</div><div class="im-val" style="color:#ff2d55">42 MIN</div></div>
+              <div class="im"><div class="im-lbl">TOTAL HOPS</div><div class="im-val" style="color:#ffb700">5</div></div>
+              <div class="im"><div class="im-lbl">AMOUNT</div><div class="im-val" style="color:#00d4ff">₹47.3L</div></div>
+              <div class="im" style="display:flex;align-items:center;gap:12px">
+                <div style="position:relative;width:40px;height:40px;">
+                  <svg viewBox="0 0 36 36" width="40" height="40" style="transform:rotate(-90deg);">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,45,85,0.15)" stroke-width="3" />
+                    <path id="inv-risk-arc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff2d55" stroke-width="3" stroke-dasharray="0, 100" style="transition:stroke-dasharray 0.1s linear;" />
+                  </svg>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#ff2d55;" id="inv-risk-txt">0</div>
+                </div>
+                <div><div class="im-lbl">RISK SCORE</div><div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);margin-top:4px;">CRITICAL</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="inv-right">
+            <div class="panel-hd">AI INVESTIGATOR</div>
+            <div class="chat-area" id="chat-area"></div>
+            <div class="ml-mini" id="ml-inv"></div>
+            <div class="chat-bar"><input id="chat-inp" placeholder="Ask about this case..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">SEND</button></div>
+            <div style="padding:14px; border-top:1px solid rgba(0,212,255,0.08);">
+              <div id="ev-btn" class="str-btn" style="width:100%; justify-content:center; padding:12px; text-align:center;" onclick="genEvidencepkg()">
+                GENERATE EVIDENCE PACKAGE
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="app-page" id="ap-reports">
+        <div class="rep-body">
+          <div class="rep-cards-grid">
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2" stroke="#00d4ff" stroke-width="1.2"/><line x1="5" y1="6" x2="13" y2="6" stroke="#00d4ff"/><line x1="5" y1="9" x2="13" y2="9" stroke="#00d4ff"/><line x1="5" y1="12" x2="9" y2="12" stroke="#00d4ff"/></svg></div><div class="rc-title">FIU-IND STR REPORT</div><div class="rc-desc">Suspicious Transaction Report in prescribed RBI format. Auto-populated from case data.</div><div class="rc-status" style="color:#00ff88">READY TO GENERATE</div></div>
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polygon points="9,2 16,5.5 16,12.5 9,16 2,12.5 2,5.5" stroke="#7c3aed" stroke-width="1.2" fill="none"/><circle cx="9" cy="9" r="2.5" stroke="#7c3aed" stroke-width="1"/></svg></div><div class="rc-title">EVIDENCE PACKAGE</div><div class="rc-desc">ZIP bundle: graph PNG, raw TX logs, ML scores, KYC mismatch analysis and timeline replay.</div><div class="rc-status" style="color:#ffb700">3 PACKAGES READY</div></div>
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="2,14 5,9 8,11 12,5 16,8" stroke="#ffb700" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div><div class="rc-title">NETWORK ANALYTICS</div><div class="rc-desc">Graph centrality, betweenness scores, and typology fingerprints for all flagged account clusters.</div><div class="rc-status" style="color:#00d4ff">PROCESSING</div></div>
+          </div>
+          <div class="rep-actions">
+            <div class="str-btn" onclick="this.textContent='GENERATING...';setTimeout(()=>this.textContent='STR GENERATED — CASE #2847',1500)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="#00d4ff" stroke-width="1.2"/><line x1="4" y1="7" x2="10" y2="7" stroke="#00d4ff"/><line x1="7" y1="4" x2="7" y2="10" stroke="#00d4ff"/></svg>GENERATE NEW STR REPORT</div>
+          </div>
+          <div class="rep-tbl">
+            <div class="rt-hd"><span class="rtc">CASE ID</span><span class="rtc">TYPOLOGY</span><span class="rtc">AMOUNT</span><span class="rtc">STATUS</span><span class="rtc">FILED</span></div>
+            <div id="rep-rows"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div class="notif" id="notif">
+  <div class="notif-title">NEW CRITICAL ALERT</div>
+  <div class="notif-msg" id="notif-msg">Round-tripping detected — ACC-0091</div>
+</div>
+
+<script>
+const C1='#00d4ff',C2='#ff2d55',C3='#00ff88',C4='#ffb700',C5='#7c3aed';
+
+/* ══ STARS ══ */
+(function(){
+  const cv=document.getElementById('stars'),ctx=cv.getContext('2d');
+  function rsz(){cv.width=innerWidth;cv.height=innerHeight;}rsz();addEventListener('resize',rsz);
+  const S=Array.from({length:180},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.2+0.2,o:Math.random()*0.5+0.1,s:Math.random()*0.004+0.001}));
+  (function draw(){ctx.clearRect(0,0,cv.width,cv.height);S.forEach(s=>{s.o+=s.s;if(s.o>0.65||s.o<0.08)s.s*=-1;ctx.beginPath();ctx.arc(s.x*cv.width,s.y*cv.height,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(180,220,255,${s.o})`;ctx.fill();});requestAnimationFrame(draw);})();
+})();
+
+/* ══ BOOT ══ */
+(function(){
+  const msgs=['INITIALISING KERNEL...','LOADING NEURAL MODELS...','CONNECTING TO GRAPH DB...','ESTABLISHING SECURE CHANNEL...','SYSTEM ONLINE'];
+  let p=0,mi=0;
+  const bar=document.getElementById('boot-bar'),st=document.getElementById('boot-status');
+  const iv=setInterval(()=>{
+    p=Math.min(100,p+(100/50)); // Takes ~2 seconds in total (40ms * 50 = 2000)
+    bar.style.width=p+'%';
+    if(mi<msgs.length-1&&p>mi*(100/(msgs.length-1))){st.textContent=msgs[mi];mi++;}
+    if(p>=100){clearInterval(iv);st.textContent=msgs[msgs.length-1];setTimeout(()=>go('land'),200);}
+  },40);
+})();
+
+/* ══ NAVIGATION ══ */
+function go(id){
+  const cur=document.querySelector('.screen.show');
+  if(cur){
+    cur.style.transition='opacity 0.4s ease, transform 0.4s ease';
+    cur.style.opacity=0; cur.style.transform='translateY(-30px)';
+    setTimeout(()=>{
+      cur.classList.remove('show');
+      cur.style.opacity=''; cur.style.transform='';
+      const nxt=document.getElementById('s-'+id);
+      nxt.style.opacity=0; nxt.style.transform='translateY(40px)';
+      nxt.classList.add('show');
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          nxt.style.transition='opacity 0.6s cubic-bezier(0.1,0.9,0.2,1), transform 0.6s cubic-bezier(0.1,0.9,0.2,1)';
+          nxt.style.opacity=1; nxt.style.transform='translateY(0)';
+        });
+      });
+      setTimeout(()=>{nxt.style.transition='';nxt.style.opacity='';nxt.style.transform='';},650);
+      if(id==='app')initApp();
+    },400);
+  }else{
+    document.getElementById('s-'+id).classList.add('show');
+    if(id==='app')initApp();
+  }
+}
+function doLogin(){
+  const u=document.getElementById('li-user').value.trim();
+  const p=document.getElementById('li-pass').value.trim();
+  const err=document.getElementById('login-err');
+  if((u==='admin'||u.includes('@'))&&p==='uniontrace'){err.classList.remove('show');go('app');}
+  else{err.classList.add('show');}
+}
+function fillDemo(){document.getElementById('li-user').value='admin';document.getElementById('li-pass').value='uniontrace';}
+
+const PAGE_TITLES={graph:'THREAT GRAPH',dash:'DASHBOARD',invest:'INVESTIGATE',reports:'REPORTS'};
+function switchPage(id,el){
+  document.querySelectorAll('.app-page').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.sbn').forEach(s=>s.classList.remove('active'));
+  document.getElementById('ap-'+id).classList.add('show');
+  el.classList.add('active');
+  document.getElementById('tb-title').textContent=PAGE_TITLES[id];
+  if(id==='invest')initInvest();
+}
+
+/* ══ 3D GRAPH ENGINE ══ */
+const NODES=[
+  {id:'n1',x:0,y:0.35,z:0,lbl:'ACC-0091',sub:'Mumbai · Origin',col:C2,r:13,risk:'CRITICAL',score:94,branch:'Mumbai',type:'Current A/C',amt:'₹47.3L',cnt:18},
+  {id:'n2',x:0.55,y:0.18,z:0.28,lbl:'ACC-0445',sub:'Delhi · Hop 1',col:C4,r:10,risk:'HIGH',score:78,branch:'Delhi',type:'Savings',amt:'₹47.2L',cnt:5},
+  {id:'n3',x:0.65,y:-0.28,z:-0.18,lbl:'ACC-0782',sub:'Bangalore · Hop 2',col:C4,r:10,risk:'HIGH',score:74,branch:'Bangalore',type:'Current A/C',amt:'₹47.1L',cnt:4},
+  {id:'n4',x:0,y:-0.48,z:0.38,lbl:'ACC-0118',sub:'Hyderabad · Hop 3',col:C4,r:9,risk:'HIGH',score:67,branch:'Hyderabad',type:'Savings',amt:'₹46.9L',cnt:3},
+  {id:'n5',x:-0.62,y:-0.2,z:-0.1,lbl:'ACC-0567',sub:'Chennai · Structuring',col:C2,r:9,risk:'CRITICAL',score:82,branch:'Chennai',type:'Savings',amt:'₹5.3L',cnt:11},
+  {id:'n6',x:-0.55,y:0.28,z:0.18,lbl:'ACC-0234',sub:'Pune · Dormant',col:C1,r:9,risk:'WATCH',score:87,branch:'Pune',type:'Savings',amt:'₹1.2Cr',cnt:1},
+  {id:'n7',x:0.1,y:0.08,z:-0.45,lbl:'FX-GATE',sub:'SWIFT Gateway',col:C5,r:8,risk:'WATCH',score:55,branch:'Mumbai',type:'Gateway',amt:'₹23L',cnt:8},
+  {id:'n8',x:-0.18,y:-0.08,z:0.42,lbl:'NEFT-HUB',sub:'Processor',col:C3,r:7,risk:'CLEAN',score:12,branch:'Mumbai',type:'Processor',amt:'₹5.3L',cnt:11},
+];
+const EDGES=[
+  {s:'n1',t:'n2',sus:true,col:C2},{s:'n2',t:'n3',sus:true,col:C2},
+  {s:'n3',t:'n4',sus:true,col:C4},{s:'n4',t:'n1',sus:true,col:C2},
+  {s:'n1',t:'n6',sus:false,col:C1},{s:'n6',t:'n7',sus:false,col:C1},
+  {s:'n5',t:'n8',sus:false,col:C4},{s:'n7',t:'n2',sus:false,col:C5},
+];
+let gRot=0,gHov=null,gSelected=null,dashOff=0,appReady=false;
+
+function proj(x,y,z,rot,W,H){
+  const c=Math.cos(rot),s=Math.sin(rot),rx=x*c-z*s,rz=x*s+z*c,sc=200/(3.2-rz);
+  return{px:W/2+rx*sc*W*0.36,py:H/2-y*sc*H*0.36,s:Math.max(0.3,sc/85)};
+}
+
+function drawGraph(cv,tl){
+  const W=cv.width,H=cv.height,ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  dashOff=(dashOff+0.35)%20;
+  ctx.strokeStyle='rgba(0,212,255,0.04)';ctx.lineWidth=1;
+  for(let i=1;i<9;i++){ctx.beginPath();ctx.arc(W/2,H/2,i*Math.min(W,H)/18,0,Math.PI*2);ctx.stroke();}
+  EDGES.forEach((e,ei)=>{
+    if(tl!==undefined&&ei/EDGES.length>tl)return;
+    const ns=NODES.find(n=>n.id===e.s),nt=NODES.find(n=>n.id===e.t);
+    if(!ns||!nt)return;
+    const ps=proj(ns.x,ns.y,ns.z,gRot,W,H),pt=proj(nt.x,nt.y,nt.z,gRot,W,H);
+    const mx=(ps.px+pt.px)/2-(pt.py-ps.py)*0.12,my=(ps.py+pt.py)/2+(pt.px-ps.px)*0.08;
+    ctx.save();ctx.setLineDash(e.sus?[6,3]:[3,6]);ctx.lineDashOffset=-dashOff;
+    ctx.strokeStyle=e.col+(e.sus?'cc':'55');ctx.lineWidth=e.sus?2:1;
+    ctx.beginPath();ctx.moveTo(ps.px,ps.py);ctx.quadraticCurveTo(mx,my,pt.px,pt.py);ctx.stroke();
+    ctx.setLineDash([]);
+    const ang=Math.atan2(pt.py-my,pt.px-mx),ar=7;
+    ctx.fillStyle=e.col+(e.sus?'cc':'55');
+    ctx.beginPath();ctx.moveTo(pt.px,pt.py);ctx.lineTo(pt.px-ar*Math.cos(ang-0.35),pt.py-ar*Math.sin(ang-0.35));ctx.lineTo(pt.px-ar*Math.cos(ang+0.35),pt.py-ar*Math.sin(ang+0.35));ctx.closePath();ctx.fill();
+    ctx.restore();
+  });
+  [...NODES].sort((a,b)=>proj(a.x,a.y,a.z,gRot,W,H).s-proj(b.x,b.y,b.z,gRot,W,H).s).forEach(n=>{
+    const p=proj(n.x,n.y,n.z,gRot,W,H),isH=gHov===n.id,isS=gSelected===n.id;
+    const bounce = Math.sin(Date.now()/400 + n.id.charCodeAt(n.id.length-1))*3*p.s;
+    p.py += bounce;
+    const r=n.r*p.s*2.4;
+    ctx.save();
+    ctx.beginPath();ctx.arc(p.px,p.py,r,0,Math.PI*2);ctx.fillStyle=n.col+'18';ctx.fill();
+    ctx.strokeStyle=n.col;ctx.lineWidth=isH||isS?3:1.5;ctx.stroke();
+    if(isS){const t=Date.now()/800%1;ctx.beginPath();ctx.arc(p.px,p.py,r+t*25,0,Math.PI*2);ctx.strokeStyle=n.col+Math.floor((1-t)*255).toString(16).padStart(2,'0');ctx.lineWidth=2*(1-t);ctx.stroke();}
+    if(n.risk==='CRITICAL'&&!isS){const t=Date.now()/1000%1;ctx.beginPath();ctx.arc(p.px,p.py,r+t*18,0,Math.PI*2);ctx.strokeStyle=n.col+Math.floor((1-t)*60).toString(16).padStart(2,'0');ctx.lineWidth=1;ctx.stroke();}
+    ctx.beginPath();ctx.arc(p.px,p.py,r*0.32,0,Math.PI*2);ctx.fillStyle=n.col;ctx.fill();
+    ctx.fillStyle=n.col;ctx.font=`${Math.max(9,10*p.s)}px 'Share Tech Mono',monospace`;ctx.textAlign='center';
+    ctx.fillText(n.lbl,p.px,p.py+r+13*p.s);
+    ctx.restore();
+  });
+}
+
+function showNode(n){
+  document.getElementById('np-id').textContent=n.lbl;
+  document.getElementById('np-sub').textContent=n.sub;
+  document.getElementById('risk-score').textContent=n.score+'/100';
+  document.getElementById('risk-fill').style.width=n.score+'%';
+  const rc={CRITICAL:C2,HIGH:C4,WATCH:C1,CLEAN:C3};
+  document.getElementById('np-rows').innerHTML=[
+    ['Risk Level',`<span style="color:${rc[n.risk]||C1}">${n.risk}</span>`],
+    ['ML Score',`<span style="color:${rc[n.risk]||C1};font-family:'Orbitron',monospace">${n.score}/100</span>`],
+    ['Branch',n.branch],['Type',n.type],['Flagged Amt',n.amt],['TX Count (30d)',n.cnt],
+  ].map(r=>`<div class="np-row"><span class="np-k">${r[0]}</span><span class="np-v">${r[1]}</span></div>`).join('');
+}
+function gMode(m,el){document.querySelectorAll('.g-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+
+function searchNode(v){
+  v=v.trim().toUpperCase();
+  const res=document.getElementById('search-res');
+  if(v===''){res.style.display='none';return;}
+  const n=NODES.find(x=>x.id.toUpperCase().includes(v)||x.lbl.toUpperCase().includes(v));
+  if(n){gSelected=n.id;showNode(n);res.style.display='none';}
+  else{res.style.display='block';}
+}
+
+/* ══ APP INIT ══ */
+function initApp(){
+  if(appReady)return;appReady=true;
+  const cv=document.getElementById('main-cv');
+  function rsz(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;}rsz();addEventListener('resize',rsz);
+  cv.addEventListener('mousemove',e=>{
+    const r=cv.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;
+    gHov=null;
+    NODES.forEach(n=>{const p=proj(n.x,n.y,n.z,gRot,cv.width,cv.height);if(Math.hypot(mx-p.px,my-p.py)<n.r*p.s*2.4){gHov=n.id;cv.style.cursor='pointer';}});
+    if(!gHov)cv.style.cursor='default';
+  });
+  cv.addEventListener('click',()=>{if(gHov){gSelected=gHov;const n=NODES.find(x=>x.id===gHov);if(n)showNode(n);}});
+  (function loop(){gRot+=0.003;drawGraph(cv);requestAnimationFrame(loop);})();
+  showNode(NODES[0]);
+  buildDash();buildReports();
+  chatLog=[{ai:true,who:'UNIONTRACE AI',txt:'Case #2847 active. Circular transaction detected: 5 accounts, 42-minute round-trip. Composite risk score: 94/100. Pattern matches round-tripping typology at 96% confidence.'}];
+  renderChat();
+  setInterval(showNotif,25000);
+  setInterval(()=>{
+    const btn=document.getElementById('alert-btn');
+    if(!btn) return;
+    const prev=btn.textContent;
+    const msgs=['NEW CRITICAL ALERT','ROUND-TRIP DETECTED','LAYERING SEQUENCE'];
+    btn.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    btn.style.background='rgba(255,45,85,0.3)';
+    btn.style.color='#fff';
+    btn.style.boxShadow='0 0 15px rgba(255,45,85,0.4)';
+    btn.style.transition='all 0.3s';
+    setTimeout(()=>{
+      btn.textContent=prev;
+      btn.style.background='';
+      btn.style.color='';
+      btn.style.boxShadow='';
+    },4000);
+  },30000);
+}
+
+/* ══ DASHBOARD ══ */
+function buildDash(){
+  const alerts=[{id:'ALT-2847',type:'Round-Tripping',col:C2,amt:'₹47.3L',t:'2m ago'},{id:'ALT-2843',type:'Rapid Layering',col:C2,amt:'₹9.8L',t:'14m ago'},{id:'ALT-2839',type:'Structuring',col:C4,amt:'₹5.3L',t:'31m ago'},{id:'ALT-2835',type:'Dormant Activated',col:C2,amt:'₹1.2Cr',t:'1h ago'},{id:'ALT-2831',type:'Profile Mismatch',col:C4,amt:'₹23L',t:'2h ago'}];
+  window.dbAlerts = alerts;
+  document.getElementById('af-body').innerHTML=window.dbAlerts.map(a=>`<div class="al-row"><div class="al-dot" style="background:${a.col}"></div><div style="flex:1"><div class="al-id">${a.id}</div><div class="al-type">${a.type}</div></div><div class="al-right"><div class="al-amt" style="color:${a.col}">${a.amt}</div><div class="al-time">${a.t}</div></div></div>`).join('');
+  
+  if(!window.alertInt) window.alertInt = setInterval(()=>{
+    const nn = {id:`ALT-${Math.floor(Math.random()*9000+1000)}`,type:['Structuring','Round-Tripping','Rapid Layering','Profile Mismatch'][Math.floor(Math.random()*4)],col:Math.random()>0.5?C2:C4,amt:`₹${(Math.random()*50).toFixed(1)}L`,t:'Just now'};
+    window.dbAlerts.unshift(nn);
+    if(window.dbAlerts.length>5) window.dbAlerts.pop();
+    const bd = document.getElementById('af-body');
+    const nr = document.createElement('div');
+    nr.className = 'al-row slide-in';
+    nr.innerHTML = `<div class="al-dot" style="background:${nn.col}"></div><div style="flex:1"><div class="al-id">${nn.id}</div><div class="al-type">${nn.type}</div></div><div class="al-right"><div class="al-amt" style="color:${nn.col}">${nn.amt}</div><div class="al-time">${nn.t}</div></div>`;
+    bd.insertBefore(nr, bd.firstChild);
+    if(bd.children.length>5) bd.lastChild.remove();
+  }, 20000);
+
+  document.querySelectorAll('.sc-num').forEach(el=>{
+    const txt = el.innerText;
+    const v=parseFloat(txt.replace(/[^0-9.]/g,''));
+    if(isNaN(v)) return;
+    const isCurrency=txt.includes('₹')||txt.includes('Cr');
+    const isPer=txt.includes('%');
+    const suffix = txt.replace(/[0-9.]/g,'').replace('₹','');
+    let start=0; const it=setInterval(()=>{
+      start+=(v-start)/8;
+      if(v-start<0.1) { start=v; clearInterval(it); el.innerText=txt; return; }
+      el.innerText=(txt.includes('₹')?'₹':'')+(start.toFixed(isPer?1:isCurrency?1:0))+(isPer?'%':'')+suffix;
+    },30);
+  });
+
+  const bd=[4,8,5,12,7,9,22,11,8,19,14,31,9,17,26,8,12,45,18,9,67,22,14,8,31,19,88,42,31,89];
+  const bm=Math.max(...bd);
+  document.getElementById('vel-bars').innerHTML=bd.map(v=>`<div class="bbar" style="height:${Math.max(4,(v/bm)*82)}px;background:${v>50?C2:v>20?C4:'#1a3a5c'}" title="${v}"></div>`).join('');
+  const typs=[['Round-Tripping',87,C2,7],['Rapid Layering',72,C4,12],['Structuring',58,C4,8],['Dormant Acct',45,C1,3],['Profile Mismatch',33,C5,5]];
+  document.getElementById('typo-rows').innerHTML=typs.map(t=>`<div class="typ-row"><span class="ty-n" style="color:${t[2]}">${t[0]}</span><div class="ty-trk"><div class="ty-f" style="width:${t[1]}%;background:${t[2]}"></div></div><span class="ty-ct">${t[3]}</span></div>`).join('');
+  const mls=[['GRAPH ANOMALY',94,C2],['VELOCITY',89,C2],['STRUCTURING',76,C4],['PROFILE',31,C3],['NET RISK',92,C2],['DORMANCY',87,C2]];
+  document.getElementById('ml-dash').innerHTML=mls.map(m=>`<div class="mlc"><div class="ml-lbl">${m[0]}</div><div class="ml-num" style="color:${m[2]}">${m[1]}<span style="font-size:10px;opacity:0.5">%</span></div><div class="ml-trk"><div class="ml-fill" style="width:${m[1]}%;background:${m[2]}"></div></div></div>`).join('');
+}
+
+/* ══ INVESTIGATE ══ */
+let invReady=false,tlP=0.65,tlPlaying=false;
+const fSteps=[
+  {name:'ACC-0091',det:'Mumbai · Rajesh Exports Pvt Ltd',amt:'₹47,30,000',col:C2,tag:'ORIGIN'},
+  {name:'ACC-0445',det:'Delhi · Ananya Trading Co. · 12 min',amt:'₹47,22,000',col:C4,tag:'HOP 1'},
+  {name:'ACC-0782',det:'Bangalore · ZM Consultants · 8 min',amt:'₹47,10,000',col:C4,tag:'HOP 2'},
+  {name:'ACC-0118',det:'Hyderabad · P. Krishnan · 22 min',amt:'₹46,95,000',col:C4,tag:'HOP 3'},
+  {name:'ACC-0091',det:'Mumbai · RETURN TO ORIGIN · 42 min total',amt:'₹46,80,000',col:C2,tag:'CIRCULAR'},
+];
+function initInvest(){
+  if(invReady)return;invReady=true;
+  document.getElementById('inv-flow').innerHTML=fSteps.map((s,i)=>`<div class="flow-item" id="fi-${i}" style="border-left:2px solid transparent; transition:all 0.3s;"><div class="fi-line"><div class="fi-dot" style="background:${s.col}"></div>${i<fSteps.length-1?'<div class="fi-conn"></div>':''}</div><div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="fi-name">${s.name}</span><span class="fi-tag" style="background:${s.col}22;color:${s.col};border:1px solid ${s.col}44">${s.tag}</span></div><div class="fi-det">${s.det}</div><div class="fi-amt" style="color:${s.col}">${s.amt}</div></div></div>`).join('');
+  
+  let arcP = 0;
+  const arcIt = setInterval(()=>{
+    arcP += (94-arcP)/8;
+    if(94-arcP<0.5){ arcP=94; clearInterval(arcIt); }
+    document.getElementById('inv-risk-arc').setAttribute('stroke-dasharray', `${arcP}, 100`);
+    document.getElementById('inv-risk-txt').textContent=Math.round(arcP);
+  }, 30);
+
+  const ml2=[['GRAPH',94,C2],['VELOCITY',89,C2],['STRUCTURING',76,C4],['PROFILE',31,C3]];
+  document.getElementById('ml-inv').innerHTML=ml2.map(m=>`<div class="mlc"><div class="ml-lbl">${m[0]}</div><div class="ml-num" style="color:${m[2]};font-size:15px">${m[1]}%</div><div class="ml-trk"><div class="ml-fill" style="width:${m[1]}%;background:${m[2]}"></div></div></div>`).join('');
+  const icv=document.getElementById('inv-cv');
+  function rsz(){icv.width=icv.offsetWidth;icv.height=icv.offsetHeight;}rsz();
+  (function loop(){gRot+=0.004;drawGraph(icv,tlP);requestAnimationFrame(loop);})();
+  
+  let isDragging=false;
+  const trk=document.getElementById('tl-trk');
+  trk.addEventListener('mousedown',e=>{isDragging=true;const r=trk.getBoundingClientRect();tlP=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));updateTL();});
+  window.addEventListener('mousemove',e=>{if(!isDragging)return;const r=trk.getBoundingClientRect();tlP=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));updateTL();});
+  window.addEventListener('mouseup',()=>{isDragging=false;});
+  // Initial update
+  updateTL();
+}
+function updateTL(){
+  const p=Math.round(tlP*100);
+  document.getElementById('tl-prog').style.width=p+'%';
+  document.getElementById('tl-knob').style.left=p+'%';
+  
+  const items = document.querySelectorAll('.flow-item');
+  const activeIdx = tlP===0 ? -1 : Math.min(Math.floor(tlP * items.length), items.length - 1);
+  items.forEach((it, idx) => {
+    if (idx <= activeIdx) {
+      it.style.background = idx === activeIdx ? 'rgba(0,212,255,0.08)' : 'transparent';
+      it.style.borderLeftColor = idx === activeIdx ? C1 : 'transparent';
+      it.style.opacity = '1';
+    } else {
+      it.style.background = 'transparent';
+      it.style.borderLeftColor = 'transparent';
+      it.style.opacity = '0.3';
+    }
+  });
+}
+function tlToggle(){
+  tlPlaying=!tlPlaying;
+  document.getElementById('play-btn').textContent=tlPlaying?'PAUSE':'PLAY';
+  if(tlPlaying){(function adv(){if(!tlPlaying)return;tlP=Math.min(1,tlP+0.005);updateTL();if(tlP<1)requestAnimationFrame(adv);else{tlPlaying=false;document.getElementById('play-btn').textContent='PLAY';}})();}
+}
+function tlReset(){tlP=0;tlPlaying=false;document.getElementById('play-btn').textContent='PLAY';updateTL();}
+
+/* ══ AI CHAT ══ */
+let chatLog=[];
+const aiReplies=['Tracing fund path from ACC-0091. 5-hop circular loop confirmed. Total cycle: 42 minutes. Pattern matches round-tripping typology at 94% confidence.','ACC-0445 in Delhi has zero prior transaction history. Account was created 3 days before these transfers — classic mule account profile.','Generating FIU-IND STR evidence package for Case #2847. All 9 required fields auto-populated from graph data.','Network centrality analysis: ACC-0091 sits in the top 2% for betweenness score across the branch network.','Parallel structuring pattern from ACC-0567: 11 transactions between ₹40K–₹49.9K over 7 days. Recommending joint STR filing.'];
+let aiIdx=0;
+function renderChat(){
+  document.getElementById('chat-area').innerHTML=chatLog.map(m=>`<div class="cm ${m.ai?'ai':'usr'}"><div class="cm-who">${m.who}</div>${m.txt}</div>`).join('');
+  document.getElementById('chat-area').scrollTop=99999;
+}
+function sendChat(){
+  const inp=document.getElementById('chat-inp'),v=inp.value.trim();if(!v)return;
+  chatLog.push({ai:false,who:'INVESTIGATOR',txt:v});inp.value='';renderChat();
+  const ca=document.getElementById('chat-area');
+  const typing=document.createElement('div');typing.className='cm ai';typing.id='typing-ind';
+  typing.innerHTML='<div class="cm-who">UNIONTRACE AI</div><div style="display:flex;align-items:center;gap:10px;"><div class="typing" style="padding:0"><span></span><span></span><span></span></div><span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:var(--t3)">ANALYSING...</span></div>';
+  ca.appendChild(typing);ca.scrollTop=99999;
+  setTimeout(()=>{const t=document.getElementById('typing-ind');if(t)t.remove();chatLog.push({ai:true,who:'UNIONTRACE AI',txt:aiReplies[aiIdx%aiReplies.length]});aiIdx++;renderChat();},1200);
+}
+
+function genEvidencepkg() {
+  const btn = document.getElementById('ev-btn');
+  if(btn.dataset.loading) return;
+  btn.dataset.loading = "1";
+  btn.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;gap:12px;"><div class="typing" style="padding:0;transform:scale(0.8);"><span></span><span></span><span></span></div> GENERATING ZIP...</div>';
+  setTimeout(()=>{
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#00ff88" stroke-width="1.8"/><polyline points="6,10 9,13 14,7" stroke="#00ff88" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg> PACKAGE READY — DOWNLOAD ZIP';
+    btn.style.background = 'rgba(0,255,136,0.1)';
+    btn.style.color = '#00ff88';
+    btn.style.borderColor = '#00ff88';
+    btn.dataset.loading = "";
+  }, 2500);
+}
+
+/* ══ REPORTS ══ */
+function buildReports(){
+  const rows=[['#2847','Round-Tripping','₹47.3L','FILED','2 hrs ago'],['#2843','Rapid Layering','₹9.8L','PENDING','14 hrs ago'],['#2831','Profile Mismatch','₹23L','FILED','1 day ago'],['#2819','Structuring','₹5.1L','APPROVED','3 days ago'],['#2805','Dormant Activation','₹1.2Cr','REVIEW','5 days ago']];
+  const sc={FILED:C3,PENDING:C4,APPROVED:C1,REVIEW:C2};
+  document.getElementById('rep-rows').innerHTML=rows.map(r=>`<div class="rt-row"><span class="rtc" style="color:${C1};font-family:'Share Tech Mono',monospace">Case ${r[0]}</span><span class="rtc">${r[1]}</span><span class="rtc" style="font-family:'Share Tech Mono',monospace">${r[2]}</span><span class="rtc" style="color:${sc[r[3]]}">${r[3]}</span><span class="rtc">${r[4]}</span></div>`).join('');
+}
+
+/* ══ NOTIFICATIONS ══ */
+const notifMsgs=['Round-tripping detected — ACC-0091 · ₹47.3L','New dormant account activated — ACC-0234 · ₹1.2Cr','Structuring pattern — 11 sub-threshold txns · ACC-0567','Profile mismatch alert — ACC-0889 · ₹23L'];
+let ni=0;
+function showNotif(){
+  const n=document.getElementById('notif');
+  document.getElementById('notif-msg').textContent=notifMsgs[ni%notifMsgs.length];ni++;
+  n.classList.add('show');setTimeout(()=>n.classList.remove('show'),4000);
+}
+</script>
+</body>
+</html>

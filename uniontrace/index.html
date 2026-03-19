@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNIONTRACE — Fund Flow Intelligence</title>
+<link rel="icon" href="assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/landing.css">
+<link rel="stylesheet" href="css/login.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/graph.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/investigate.css">
+<link rel="stylesheet" href="css/reports.css">
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<!-- ═══════════ BOOT SCREEN ═══════════ -->
+<div class="screen show" id="s-boot">
+  <div class="boot-logo">UNION<span>TRACE</span></div>
+  <div class="boot-sub">UNIONTRACE OS BOOTING...</div>
+  <div class="boot-bar-wrap"><div class="boot-bar" id="boot-bar"></div></div>
+  <div class="boot-status" id="boot-status">INITIALISING KERNEL...</div>
+</div>
+
+<!-- ═══════════ LANDING ═══════════ -->
+<div class="screen" id="s-land">
+  <div class="land-grid"></div>
+  <div class="orbs">
+    <div class="orb" style="width:450px;height:450px;background:rgba(0,212,255,0.05);top:-120px;left:-120px;animation-delay:0s;"></div>
+    <div class="orb" style="width:320px;height:320px;background:rgba(255,45,85,0.05);bottom:-80px;right:-80px;animation-delay:3s;"></div>
+    <div class="orb" style="width:220px;height:220px;background:rgba(124,58,237,0.05);top:40%;right:10%;animation-delay:1.5s;"></div>
+  </div>
+
+  <nav class="land-nav" id="land-nav">
+    <div class="logo-txt">UNION<span>TRACE</span></div>
+    <div class="mob-menu-btn" onclick="document.getElementById('m-menu').classList.toggle('show')"><span></span><span></span><span></span></div>
+    <div class="lnav-links" id="m-menu">
+      <div style="display:flex;flex-direction:row;width:100%;justify-content:center;gap:32px;" class="m-flex-col">
+        <span class="lnl" onclick="document.getElementById('s-feat').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">Platform</span>
+        <span class="lnl" onclick="document.getElementById('s-how').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">How It Works</span>
+        <span class="lnl" onclick="document.getElementById('s-comp').scrollIntoView({behavior:'smooth'});document.getElementById('m-menu').classList.remove('show')">Compliance</span>
+      </div>
+      <div class="lnav-right">
+        <div class="btn-ghost" onclick="go('login')">Sign In</div>
+        <div class="btn-primary" onclick="go('login')">Request Demo</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow"><span class="hero-dot"></span>AI-POWERED FRAUD INTELLIGENCE</div>
+    <h1 class="hero-h1">Follow The <span class="hl">Money.</span><br>Stop The <span class="hl2">Fraud.</span></h1>
+    <p class="hero-sub">UNIONTRACE maps every rupee moving through your bank in real time. Graph analytics and machine learning detect round-tripping, layering, and structuring before investigators even open their laptops.</p>
+    <div class="hero-btns">
+      <div class="btn-primary" style="padding:14px 40px;font-size:15px;" onclick="go('login')">Get Started Free</div>
+      <div class="btn-ghost" style="padding:14px 40px;font-size:15px;" onclick="go('login')">Watch Live Demo</div>
+    </div>
+    <div class="hero-stats">
+      <div class="hs-item"><div class="hs-val">98.7%</div><div class="hs-lbl">ML ACCURACY</div></div>
+      <div class="hs-item"><div class="hs-val">&lt;5 MIN</div><div class="hs-lbl">DETECT TIME</div></div>
+      <div class="hs-item"><div class="hs-val">5 CR+</div><div class="hs-lbl">TX MONITORED</div></div>
+      <div class="hs-item"><div class="hs-val">FIU-IND</div><div class="hs-lbl">COMPLIANT</div></div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="s-feat">
+    <div class="section-tag">PLATFORM CAPABILITIES</div>
+    <h2 class="section-h">Everything You Need to <span>Detect Fraud</span></h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="#00d4ff" stroke-width="1.4"/><circle cx="3" cy="5" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="17" cy="5" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="3" cy="15" r="2" stroke="#00d4ff" stroke-width="1.2"/><circle cx="17" cy="15" r="2" stroke="#00d4ff" stroke-width="1.2"/><line x1="7.2" y1="8.5" x2="4.8" y2="6.8" stroke="#00d4ff" stroke-width="1"/><line x1="12.8" y1="8.5" x2="15.2" y2="6.8" stroke="#00d4ff" stroke-width="1"/><line x1="7.2" y1="11.5" x2="4.8" y2="13.2" stroke="#00d4ff" stroke-width="1"/><line x1="12.8" y1="11.5" x2="15.2" y2="13.2" stroke="#00d4ff" stroke-width="1"/></svg></div>
+        <div class="fc-title">3D Transaction Network Graph</div>
+        <div class="fc-desc">Visualise every fund hop across accounts, branches, and channels in a live rotating 3D network. Click any node to see full account intelligence instantly.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17L7 11L10 13L14 7L17 9" stroke="#ff2d55" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="14" cy="7" r="2.5" fill="rgba(255,45,85,0.2)" stroke="#ff2d55" stroke-width="1.2"/></svg></div>
+        <div class="fc-title">5 Fraud Typology Detectors</div>
+        <div class="fc-desc">Purpose-built ML models detect Round-Tripping, Rapid Layering, Structuring, Dormant Account Activation, and Profile Mismatch — simultaneously, in real time.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="2" stroke="#00ff88" stroke-width="1.4"/><line x1="6" y1="7" x2="14" y2="7" stroke="#00ff88" stroke-width="1"/><line x1="6" y1="10" x2="14" y2="10" stroke="#00ff88" stroke-width="1"/><line x1="6" y1="13" x2="10" y2="13" stroke="#00ff88" stroke-width="1"/></svg></div>
+        <div class="fc-title">One-Click FIU-IND STR Report</div>
+        <div class="fc-desc">Auto-generate RBI-compliant Suspicious Transaction Reports with all required fields pre-populated from graph and ML data. File in minutes, not hours.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="#7c3aed" stroke-width="1.4"/><line x1="13.5" y1="13.5" x2="17" y2="17" stroke="#7c3aed" stroke-width="1.6" stroke-linecap="round"/><line x1="7" y1="9" x2="11" y2="9" stroke="#7c3aed" stroke-width="1"/><line x1="9" y1="7" x2="9" y2="11" stroke="#7c3aed" stroke-width="1"/></svg></div>
+        <div class="fc-title">AI Investigator Chat</div>
+        <div class="fc-desc">Ask natural language questions and get graph-grounded answers instantly. "Trace all funds from ACC-0091 in the last 7 days" — and watch it animate the answer.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><polygon points="10,2 18,6.5 18,13.5 10,18 2,13.5 2,6.5" stroke="#ffb700" stroke-width="1.4" fill="none"/><polyline points="6,10 9,7 11,12 14,9" stroke="#ffb700" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+        <div class="fc-title">Timeline Replay</div>
+        <div class="fc-desc">Scrub back in time to watch exactly how funds moved, step by step. Show investigators and regulators a frame-by-frame reconstruction of any suspicious transaction chain.</div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="5" height="9" rx="1" stroke="#00d4ff" stroke-width="1.2"/><rect x="8" y="5" width="5" height="12" rx="1" stroke="#00d4ff" stroke-width="1.2"/><rect x="13" y="2" width="5" height="15" rx="1" stroke="#00d4ff" stroke-width="1.2"/></svg></div>
+        <div class="fc-title">Real-Time Risk Scoring</div>
+        <div class="fc-desc">Six ML models run simultaneously on every transaction. Composite risk scores from 0–100 update in real time as new data arrives — no batch jobs, no delays.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="howitworks" id="s-how">
+    <div class="section-tag">HOW IT WORKS</div>
+    <h2 class="section-h">From <span>Transaction</span> to Evidence in Minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Ingest</div>
+        <div class="step-desc">Every transaction streams into UNIONTRACE via Kafka in real time — NEFT, RTGS, IMPS, SWIFT, cash.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Graph</div>
+        <div class="step-desc">Funds are mapped as edges between account nodes in a Neo4j graph database updated within milliseconds.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Detect</div>
+        <div class="step-desc">Six ML models score every new edge for circular paths, layering velocity, structuring patterns, and profile mismatches.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Alert</div>
+        <div class="step-desc">Critical alerts surface in under 5 minutes with a composite risk score, typology tag, and full fund trail pre-loaded.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-title">Report</div>
+        <div class="step-desc">One click generates a FIU-IND compliant STR with all required fields auto-populated — ready to submit to regulators.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLIANCE -->
+  <section class="compliance" id="s-comp">
+    <div class="section-tag">COMPLIANCE & TRUST</div>
+    <h2 class="section-h" style="margin-bottom:40px;">Built for <span>Indian Banking</span> Regulations</h2>
+    <div class="comp-grid">
+      <div class="comp-card"><div class="cc-val">RBI</div><div class="cc-lbl">Master Directions on KYC 2016 (Updated 2023)</div></div>
+      <div class="comp-card"><div class="cc-val">PMLA</div><div class="cc-lbl">Prevention of Money Laundering Act compliance built-in</div></div>
+      <div class="comp-card"><div class="cc-val">FIU-IND</div><div class="cc-lbl">Auto-generated STR & CTR in prescribed format</div></div>
+      <div class="comp-card"><div class="cc-val">AES-256</div><div class="cc-lbl">Bank-grade encryption in transit and at rest</div></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo">UNION<span>TRACE</span></div>
+    <div class="footer-links">
+      <span class="fl">Privacy Policy</span>
+      <span class="fl">Terms of Use</span>
+      <span class="fl">Security</span>
+      <span class="fl">Contact</span>
+    </div>
+    <div class="footer-copy">© 2025 UNIONTRACE · FUND FLOW INTELLIGENCE</div>
+  </footer>
+</div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<div class="screen" id="s-login">
+  <div class="login-bg-grid"></div>
+  <div class="back-lnk" onclick="go('land')">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="9,2 4,7 9,12" stroke="#3d6478" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+    BACK
+  </div>
+  <div class="login-split">
+    <div class="login-left">
+      <div class="ll-tag">UNIONTRACE INTELLIGENCE PLATFORM v2.1</div>
+      <h2 class="ll-h">Fraud doesn't<br>wait. <span>Neither</span><br>should you.</h2>
+      <p class="ll-sub">Real-time fund flow tracking across every account, branch, and channel. Five fraud typologies. One unified dashboard. FIU-IND compliant reporting.</p>
+      <div class="ll-feats">
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#00d4ff" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#00d4ff" stroke-width="1.2" fill="none"/></svg></div><div class="lf-text"><strong>3D Transaction Graph</strong> — every hop visualised live</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#7c3aed" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2" stroke="#7c3aed" stroke-width="1"/></svg></div><div class="lf-text"><strong>AI Investigator Chat</strong> — ask anything, get graph answers</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#ffb700" stroke-width="1.2"/><line x1="5" y1="8" x2="11" y2="8" stroke="#ffb700"/><line x1="8" y1="5" x2="8" y2="11" stroke="#ffb700"/></svg></div><div class="lf-text"><strong>One-click FIU-IND STR</strong> — auto-generate compliant reports</div></div>
+        <div class="lf"><div class="lf-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="#00ff88" stroke-width="1.2"/><polyline points="4,9 7,6 9,11 12,8" stroke="#00ff88" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div><div class="lf-text"><strong>Real-time risk scoring</strong> — 6 ML models, instant alerts</div></div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="lr-logo">UNION<span>TRACE</span></div>
+      <div class="lr-sub">SECURE ACCESS PORTAL</div>
+      <div class="sec-badge"><div class="sb-dot"></div><span class="sb-txt">256-BIT ENCRYPTED · RBI COMPLIANT</span></div>
+      <div class="fg"><label>OFFICER ID / EMAIL</label><input id="li-user" type="text" placeholder="officer@bank.com"></div>
+      <div class="fg"><label>PASSWORD</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="login-err" id="login-err">INVALID CREDENTIALS — TRY: admin / uniontrace</div>
+      <button class="login-btn" onclick="doLogin()">ACCESS DASHBOARD</button>
+      <div class="login-hint">Demo: <span onclick="fillDemo()">admin / uniontrace</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div class="screen" id="s-app">
+  <div class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><polygon points="8,1 15,4.5 15,11.5 8,15 1,11.5 1,4.5" stroke="#00d4ff" stroke-width="1.2" fill="none"/><circle cx="8" cy="8" r="2.5" fill="#00d4ff"/></svg></div>
+      <div class="sb-logo-txt">UNIONTRACE</div>
+    </div>
+    <div class="sb-nav">
+      <div class="sbn active" onclick="switchPage('graph',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="5" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="15" cy="5" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="3" cy="13" r="1.8" stroke="currentColor" stroke-width="1.3"/><circle cx="15" cy="13" r="1.8" stroke="currentColor" stroke-width="1.3"/><line x1="6.5" y1="8" x2="4.5" y2="6.5" stroke="currentColor" stroke-width="1"/><line x1="11.5" y1="8" x2="13.5" y2="6.5" stroke="currentColor" stroke-width="1"/><line x1="6.5" y1="10" x2="4.5" y2="11.5" stroke="currentColor" stroke-width="1"/><line x1="11.5" y1="10" x2="13.5" y2="11.5" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Threat Graph</span>
+        <span class="sbn-bdg">7</span>
+      </div>
+      <div class="sbn" onclick="switchPage('dash',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="4" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="8" width="6" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="11" width="6" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg></div>
+        <span class="sbn-lbl">Dashboard</span>
+      </div>
+      <div class="sbn" onclick="switchPage('invest',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><line x1="12.5" y1="12.5" x2="16" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="8" x2="10" y2="8" stroke="currentColor" stroke-width="1"/><line x1="8" y1="6" x2="8" y2="10" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Investigate</span>
+      </div>
+      <div class="sbn" onclick="switchPage('reports',this)">
+        <div class="sbn-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1"/><line x1="6" y1="9" x2="12" y2="9" stroke="currentColor" stroke-width="1"/><line x1="6" y1="12" x2="10" y2="12" stroke="currentColor" stroke-width="1"/></svg></div>
+        <span class="sbn-lbl">Reports</span>
+      </div>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-av">AK</div>
+      <div class="sb-uinfo"><div class="sb-uname">Arjun Kumar</div><div class="sb-urole">SR. INVESTIGATOR</div></div>
+    </div>
+  </div>
+
+  <div class="app-main">
+    <div class="topbar">
+      <div class="tb-title" id="tb-title">THREAT GRAPH</div>
+      <div class="tb-search"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#3d6478" stroke-width="1.2"/><line x1="9" y1="9" x2="12" y2="12" stroke="#3d6478" stroke-width="1.4" stroke-linecap="round"/></svg><input placeholder="Search accounts, cases..."></div>
+      <div class="tb-live"><span class="tb-live-dot"></span>LIVE MONITORING</div>
+      <div class="tb-alert-btn" id="alert-btn">7 CRITICAL ALERTS</div>
+    </div>
+    <div class="app-content">
+
+      <!-- GRAPH -->
+      <div class="app-page show" id="ap-graph">
+        <div class="graph-layout" style="height:100%;">
+          <div class="graph-cv-area">
+            <canvas id="main-cv"></canvas>
+            <div class="g-ctrl">
+              <div class="g-btn active" onclick="gMode('flow',this)">FLOW MAP</div>
+              <div class="g-btn" onclick="gMode('circular',this)">CIRCULAR TX</div>
+              <div class="g-btn" onclick="gMode('layer',this)">LAYERING</div>
+              <div class="g-btn" onclick="gMode('all',this)">ALL NODES</div>
+            </div>
+            <div class="g-legend">
+              <div class="gli"><div class="gld" style="background:#ff2d55"></div>CRITICAL</div>
+              <div class="gli"><div class="gld" style="background:#ffb700"></div>HIGH RISK</div>
+              <div class="gli"><div class="gld" style="background:#00d4ff"></div>DORMANT</div>
+              <div class="gli"><div class="gld" style="background:#00ff88"></div>CLEAN</div>
+              <div class="gli"><div class="gld" style="background:#7c3aed"></div>GATEWAY</div>
+            </div>
+            <div class="g-hud">
+              <div class="g-hud-card"><div class="ghc-lbl">THREATS</div><div class="ghc-val" style="color:#ff2d55">07</div></div>
+              <div class="g-hud-card"><div class="ghc-lbl">FLAGGED</div><div class="ghc-val" style="color:#00d4ff">₹2.4Cr</div></div>
+            </div>
+          </div>
+          <div class="node-panel">
+            <div style="padding:16px 20px 0; border-bottom:none;">
+              <input id="node-search" placeholder="Search Account ID..." style="width:100%; background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.1); color:var(--t1); padding:10px 12px; font-family:'Share Tech Mono',monospace; font-size:11px; outline:none; transition:border 0.2s;" onfocus="this.style.borderColor=C1" onblur="this.style.borderColor='rgba(0,212,255,0.1)'" oninput="searchNode(this.value)">
+              <div id="search-res" style="color:var(--c2); font-family:'Share Tech Mono',monospace; font-size:9px; margin-top:6px; display:none; letter-spacing:1px;">NODE NOT FOUND</div>
+            </div>
+            <div class="np-hd"><div class="np-tag">NODE INTELLIGENCE</div><div class="np-id" id="np-id">ACC-0091</div><div class="np-sub" id="np-sub">Mumbai · Current A/C</div></div>
+            <div class="np-rows" id="np-rows"></div>
+            <div class="risk-section">
+              <div class="risk-label-row"><span class="risk-title">COMPOSITE RISK</span><span class="risk-score" id="risk-score">94/100</span></div>
+              <div class="risk-track"><div class="risk-fill" id="risk-fill" style="width:94%"></div></div>
+              <div class="risk-marks"><span>LOW</span><span>MED</span><span>HIGH</span><span>CRIT</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="app-page" id="ap-dash">
+        <div class="dash-body">
+          <div class="stat-row">
+            <div class="sc r"><div class="sc-lbl">CRITICAL ALERTS</div><div class="sc-num" style="color:#ff2d55">07</div><div class="sc-chg">↑ +3 FROM YESTERDAY</div></div>
+            <div class="sc a"><div class="sc-lbl">HIGH RISK</div><div class="sc-num" style="color:#ffb700">23</div><div class="sc-chg">UNDER REVIEW</div></div>
+            <div class="sc b"><div class="sc-lbl">FLAGGED FUNDS</div><div class="sc-num" style="color:#00d4ff">₹2.4Cr</div><div class="sc-chg">ACROSS 14 ACCOUNTS</div></div>
+            <div class="sc g"><div class="sc-lbl">ML ACCURACY</div><div class="sc-num" style="color:#00ff88">98.7%</div><div class="sc-chg">6 MODELS ACTIVE</div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:-10px;margin-bottom:12px;gap:8px;">
+            <div class="g-btn active" style="border-color:var(--c1);color:var(--c1);background:rgba(0,212,255,0.07)">TODAY</div>
+            <div class="g-btn">7 DAYS</div>
+            <div class="g-btn">30 DAYS</div>
+          </div>
+          <div class="dash-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+            <!-- Col 1: Alerts and Typology -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="dc" style="flex:1;"><div class="dc-hd"><span class="dc-ttl">LIVE ALERT FEED</span><div class="tb-live" style="transform:scale(0.8);transform-origin:right"><span class="tb-live-dot"></span>LIVE</div></div><div class="dc-body" id="af-body" style="overflow-y:auto;max-height:210px;"></div></div>
+              <div class="dc"><div class="dc-hd"><span class="dc-ttl">FRAUD TYPOLOGY</span></div><div class="dc-body" id="typo-rows"></div></div>
+            </div>
+            <!-- Col 2: Heatmap -->
+            <div class="dc" style="grid-row:span 2"><div class="dc-hd"><span class="dc-ttl">INDIA BRANCH HEATMAP</span></div>
+              <div class="dc-body" style="position:relative; display:flex; justify-content:center; align-items:center; padding:0; overflow:hidden; min-height:420px;">
+                <svg viewBox="0 0 400 400" width="100%" height="320" style="opacity:0.25; pointer-events:none;">
+                  <path d="M120,50 L180,80 L240,40 L300,100 L280,180 L350,220 L300,320 L240,380 L180,350 L120,380 L80,280 L60,200 L100,120 Z" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M180,80 L200,150 L280,180 M200,150 L180,250 L120,380 M180,250 L300,320 M200,150 L100,120" fill="none" stroke="var(--c1)" stroke-width="1" stroke-dasharray="4 4"/>
+                </svg>
+                <div style="position:absolute; top:35%; left:30%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c2); width:14px; height:14px; border-radius:50%; box-shadow:0 0 20px 4px var(--c2); animation:blink 1.8s infinite;"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:10px; margin-top:8px; color:var(--c2); font-weight:bold;">MUMBAI</span>
+                </div>
+                <div style="position:absolute; top:20%; left:55%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c4); width:10px; height:10px; border-radius:50%; box-shadow:0 0 12px 2px var(--c4);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c4);">DELHI</span>
+                </div>
+                <div style="position:absolute; top:70%; left:45%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c1); width:8px; height:8px; border-radius:50%; box-shadow:0 0 10px 2px var(--c1);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c1);">BANGALORE</span>
+                </div>
+                <div style="position:absolute; top:65%; left:70%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c2); width:12px; height:12px; border-radius:50%; box-shadow:0 0 15px 3px var(--c2); animation:blink 1.5s infinite;"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c2); font-weight:bold;">CHENNAI</span>
+                </div>
+                <div style="position:absolute; top:55%; left:40%; display:flex; flex-direction:column; align-items:center;">
+                  <div style="background:var(--c3); width:8px; height:8px; border-radius:50%; box-shadow:0 0 8px 1px var(--c3);"></div>
+                  <span style="font-family:'Share Tech Mono'; font-size:9px; margin-top:6px; color:var(--c3);">HYDERABAD</span>
+                </div>
+              </div>
+            </div>
+            <!-- Col 3: Velocity and ML -->
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div class="dc"><div class="dc-hd"><span class="dc-ttl">TX VELOCITY</span></div><div class="dc-body"><div class="bar-wrap" id="vel-bars"></div></div></div>
+              <div class="dc" style="flex:1;"><div class="dc-hd"><span class="dc-ttl">ML SCORES</span></div><div class="dc-body"><div class="ml-grid" id="ml-dash"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVESTIGATE -->
+      <div class="app-page" id="ap-invest">
+        <div class="inv-layout" style="height:100%;">
+          <div class="inv-left">
+            <div class="panel-hd">FUND FLOW TRACE — CASE #2847</div>
+            <div style="overflow-y:auto;flex:1;" id="inv-flow"></div>
+            <div class="tl-panel">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:8px;">TIMELINE REPLAY</div>
+              <div class="tl-trk" id="tl-trk"><div class="tl-prog" id="tl-prog" style="width:65%"></div><div class="tl-knob" id="tl-knob" style="left:65%"></div></div>
+              <div class="tl-times"><span>T+0:00</span><span>T+0:42</span></div>
+              <div class="tl-btns">
+                <div class="g-btn" id="play-btn" onclick="tlToggle()" style="flex:1;text-align:center;">PLAY</div>
+                <div class="g-btn" onclick="tlReset()" style="flex:1;text-align:center;">RESET</div>
+              </div>
+            </div>
+          </div>
+          <div class="inv-center">
+            <div class="inv-cv-area"><canvas id="inv-cv"></canvas></div>
+            <div class="inv-meta">
+              <div class="im"><div class="im-lbl">CYCLE TIME</div><div class="im-val" style="color:#ff2d55">42 MIN</div></div>
+              <div class="im"><div class="im-lbl">TOTAL HOPS</div><div class="im-val" style="color:#ffb700">5</div></div>
+              <div class="im"><div class="im-lbl">AMOUNT</div><div class="im-val" style="color:#00d4ff">₹47.3L</div></div>
+              <div class="im" style="display:flex;align-items:center;gap:12px">
+                <div style="position:relative;width:40px;height:40px;">
+                  <svg viewBox="0 0 36 36" width="40" height="40" style="transform:rotate(-90deg);">
+                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,45,85,0.15)" stroke-width="3" />
+                    <path id="inv-risk-arc" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff2d55" stroke-width="3" stroke-dasharray="0, 100" style="transition:stroke-dasharray 0.1s linear;" />
+                  </svg>
+                  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:#ff2d55;" id="inv-risk-txt">0</div>
+                </div>
+                <div><div class="im-lbl">RISK SCORE</div><div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);margin-top:4px;">CRITICAL</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="inv-right">
+            <div class="panel-hd">AI INVESTIGATOR</div>
+            <div class="chat-area" id="chat-area"></div>
+            <div class="ml-mini" id="ml-inv"></div>
+            <div class="chat-bar"><input id="chat-inp" placeholder="Ask about this case..." onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">SEND</button></div>
+            <div style="padding:14px; border-top:1px solid rgba(0,212,255,0.08);">
+              <div id="ev-btn" class="str-btn" style="width:100%; justify-content:center; padding:12px; text-align:center;" onclick="genEvidencepkg()">
+                GENERATE EVIDENCE PACKAGE
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="app-page" id="ap-reports">
+        <div class="rep-body">
+          <div class="rep-cards-grid">
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2" stroke="#00d4ff" stroke-width="1.2"/><line x1="5" y1="6" x2="13" y2="6" stroke="#00d4ff"/><line x1="5" y1="9" x2="13" y2="9" stroke="#00d4ff"/><line x1="5" y1="12" x2="9" y2="12" stroke="#00d4ff"/></svg></div><div class="rc-title">FIU-IND STR REPORT</div><div class="rc-desc">Suspicious Transaction Report in prescribed RBI format. Auto-populated from case data.</div><div class="rc-status" style="color:#00ff88">READY TO GENERATE</div></div>
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polygon points="9,2 16,5.5 16,12.5 9,16 2,12.5 2,5.5" stroke="#7c3aed" stroke-width="1.2" fill="none"/><circle cx="9" cy="9" r="2.5" stroke="#7c3aed" stroke-width="1"/></svg></div><div class="rc-title">EVIDENCE PACKAGE</div><div class="rc-desc">ZIP bundle: graph PNG, raw TX logs, ML scores, KYC mismatch analysis and timeline replay.</div><div class="rc-status" style="color:#ffb700">3 PACKAGES READY</div></div>
+            <div class="rc"><div class="rc-icon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="2,14 5,9 8,11 12,5 16,8" stroke="#ffb700" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div><div class="rc-title">NETWORK ANALYTICS</div><div class="rc-desc">Graph centrality, betweenness scores, and typology fingerprints for all flagged account clusters.</div><div class="rc-status" style="color:#00d4ff">PROCESSING</div></div>
+          </div>
+          <div class="rep-actions">
+            <div class="str-btn" onclick="this.textContent='GENERATING...';setTimeout(()=>this.textContent='STR GENERATED — CASE #2847',1500)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="#00d4ff" stroke-width="1.2"/><line x1="4" y1="7" x2="10" y2="7" stroke="#00d4ff"/><line x1="7" y1="4" x2="7" y2="10" stroke="#00d4ff"/></svg>GENERATE NEW STR REPORT</div>
+          </div>
+          <div class="rep-tbl">
+            <div class="rt-hd"><span class="rtc">CASE ID</span><span class="rtc">TYPOLOGY</span><span class="rtc">AMOUNT</span><span class="rtc">STATUS</span><span class="rtc">FILED</span></div>
+            <div id="rep-rows"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div class="notif" id="notif">
+  <div class="notif-title">NEW CRITICAL ALERT</div>
+  <div class="notif-msg" id="notif-msg">Round-tripping detected — ACC-0091</div>
+</div>
+
+<script src="js/navigation.js"></script>
+<script src="js/stars.js"></script>
+<script src="js/boot.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/investigate.js"></script>
+<script src="js/reports.js"></script>
+</body>
+</html>

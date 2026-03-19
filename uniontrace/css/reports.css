@@ -1,0 +1,21 @@
+/* Reports page styles */
+/* ── REPORTS PAGE ── */
+.rep-body{padding:24px;}
+.rep-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.rc{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);padding:24px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+.rc:hover{border-color:rgba(0,212,255,0.3);transform:translateY(-3px);background:rgba(0,212,255,0.02);}
+.rc-icon{width:42px;height:42px;border:1px solid rgba(0,212,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.rc-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;margin-bottom:8px;}
+.rc-desc{font-size:12px;color:var(--t2);line-height:1.55;margin-bottom:14px;}
+.rc-status{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;}
+.rep-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.str-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.25);color:var(--c1);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
+.str-btn:hover{background:rgba(0,212,255,0.14);}
+.rep-tbl{background:var(--bg2);border:1px solid rgba(0,212,255,0.1);}
+.rt-hd{display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:11px 18px;border-bottom:1px solid rgba(0,212,255,0.1);background:rgba(0,212,255,0.03);}
+.rtc{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;}
+.rt-row{display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr 1fr;padding:13px 18px;border-bottom:1px solid rgba(0,212,255,0.05);cursor:pointer;transition:background 0.15s;}
+.rt-row:hover{background:rgba(0,212,255,0.02);}
+.rt-row .rtc{color:var(--t1);font-size:11px;}
+.slide-in{animation:slideRight 0.4s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;}
+@keyframes slideRight{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
