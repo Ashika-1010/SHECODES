@@ -143,10 +143,10 @@ Team SheCodes
 
  Member 
 
- Vrushti Mehta 
- Dhruvi Mandviya 
- Ashika Shetty 
- Arya Desai 
+ Vrushti Mehta |
+ Dhruvi Mandviya | 
+ Ashika Shetty |
+ Arya Desai |
 
 ---
 
